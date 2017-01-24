@@ -2,39 +2,39 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Akatruki</title>
-    <link>http://hongxuanlee.github.io/index.xml</link>
+    <link>//hongxuanlee.github.io/index.xml</link>
     <description>Recent content on Akatruki</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 24 Jan 2017 16:53:40 +0800</lastBuildDate>
-    <atom:link href="http://hongxuanlee.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="//hongxuanlee.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>second</title>
-      <link>http://hongxuanlee.github.io/blog/second/</link>
+      <link>//hongxuanlee.github.io/blog/second/</link>
       <pubDate>Tue, 24 Jan 2017 16:53:40 +0800</pubDate>
       
-      <guid>http://hongxuanlee.github.io/blog/second/</guid>
+      <guid>//hongxuanlee.github.io/blog/second/</guid>
       <description>&lt;p&gt;second post&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>about</title>
-      <link>http://hongxuanlee.github.io/about/</link>
+      <link>//hongxuanlee.github.io/about/</link>
       <pubDate>Fri, 13 Jan 2017 22:25:26 +0800</pubDate>
       
-      <guid>http://hongxuanlee.github.io/about/</guid>
+      <guid>//hongxuanlee.github.io/about/</guid>
       <description>&lt;p&gt;A Web Developer, to share technology and life in here.&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>start up</title>
-      <link>http://hongxuanlee.github.io/blog/start-up/</link>
+      <link>//hongxuanlee.github.io/blog/start-up/</link>
       <pubDate>Fri, 13 Jan 2017 22:08:22 +0800</pubDate>
       
-      <guid>http://hongxuanlee.github.io/blog/start-up/</guid>
+      <guid>//hongxuanlee.github.io/blog/start-up/</guid>
       <description>&lt;p&gt;let&amp;rsquo;s start up write blog&amp;hellip;.&lt;/p&gt;
 </description>
     </item>

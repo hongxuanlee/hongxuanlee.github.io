@@ -41,13 +41,13 @@
 
 
 <header class="row text-left title">
-  <h1 class="title">我的tmux常用操作</h1>
+  <h1 class="title">我的vim常用操作</h1>
 </header>
 <section id="category-pane" class="row meta">
   
   <div class="col-md-12">
     <h6 class="text-left meta">
-      PUBLISHED ON NOV 24, 2016 
+      PUBLISHED ON NOV 25, 2016 
     </h6>
   </div>
   
@@ -56,91 +56,78 @@
   <div class="col-md-12 text-justify content">
     
 
-<h2 id="tmux-shortcut">tmux shortcut</h2>
-
-<h3 id="via-shortcut">Via shortcut</h3>
-
-<pre><code>Ctrl-b s
-</code></pre>
-
-<h3 id="via-tmux-command">via tmux command</h3>
-
-<pre><code>tmux ls
-</code></pre>
-
-<h3 id="scroll">scroll</h3>
-
-<pre><code>// first
-prefix + [ 
-//secont
-fn + &lt;arrow&gt;
-</code></pre>
-
-<h3 id="create-a-new-session">create a new session</h3>
-
-<pre><code>tmux new -s session-name
-tmux new
-</code></pre>
-
-<h3 id="attaching-to-an-existing-session">attaching to an existing session</h3>
-
-<pre><code>tmux a // connect you to the first available session
-tmux a -t session-name
-</code></pre>
-
-<h3 id="detaching-from-a-session">detaching from a session</h3>
-
-<pre><code>tmux detach
-// or shortcut
-Ctrl-b d 
-</code></pre>
-
-<h3 id="killing-a-session">killing a session</h3>
-
-<pre><code>tmux kill-session -t session-name
-</code></pre>
-
-<h3 id="project">project</h3>
+<h3 id="move">move</h3>
 
 <ul>
-<li><code>prefix + option + [arrow key]</code> adjust the window size</li>
-<li><code>z</code> magnify current window</li>
+<li><code>0</code> jump to line header</li>
+<li><code>^</code> jump to line header without blank</li>
+<li><code>$</code> jump to end of line</li>
+<li><code>w</code> skip next word head</li>
+<li><code>e</code> skip next word end</li>
+<li><code>%</code> jump match brackets</li>
+<li><code>*</code> jump to next same word with cursor</li>
+<li><code>#</code> jump to previous same word with cursor</li>
+<li><code>f&lt;letter&gt;</code> jump to letter  eg: fa</li>
+<li><code>&lt;num&gt;f&lt;letter&gt;</code> jump to letter appear third time eg: 3fa</li>
 </ul>
 
-<h3 id="configuration">configuration</h3>
+<h3 id="insert">insert</h3>
 
 <ul>
-<li>~/.tmux.conf</li>
-<li>see ./tmux.conf</li>
+<li><code>o</code> insert new line</li>
+<li><code>O</code> insert new line above current line</li>
+<li><code>a</code> insert after cursor</li>
+<li><code>cw</code> replace cursor to word end</li>
 </ul>
 
-<h3 id="windows">windows</h3>
+<h3 id="operation">operation</h3>
 
 <ul>
-<li><code>c</code> create a new window</li>
-<li><code>,</code> rename the current window</li>
-<li><code>q</code> command-prompt &ldquo;move-window -t &lsquo;%%&rsquo;&rdquo;</li>
-<li><code>w</code> list windows</li>
-<li><code>%</code> split horizontally</li>
-<li><code>&quot;</code> split vertically</li>
-<li><code>n</code> change to the next window</li>
-<li><code>p</code> change to the previous window</li>
-<li><code>0 to 9</code> select windows 0 through 9</li>
-<li><code>&amp;</code> kill window</li>
+<li><code>.</code> repeat last operation</li>
+<li><code>N&lt;command&gt;</code> repeat cmmand N</li>
+<li><code>:suspend</code> <code>ctrl + z</code> suspend</li>
+<li><code>fg</code> recover suspend</li>
 </ul>
 
-<h3 id="panes">Panes</h3>
+<h3 id="delete">delete</h3>
 
 <ul>
-<li><code>%</code> create a horizontal pane</li>
-<li><code>&quot;</code> create a vertical pane</li>
-<li><code>q</code> show pane numbers</li>
-<li><code>o</code> toggle between panes !!!</li>
-<li><code>}</code> swap with next pane</li>
-<li><code>{</code> swap with previous pane</li>
-<li><code>!</code> break the pane out of the window / force quit current pane</li>
-<li><code>x</code> kill the current pane, it&rsquo;s will ask Y/N</li>
-<li><code>q</code> show pane list</li>
+<li><code>de</code> delete word</li>
+</ul>
+
+<h3 id="plugin">plugin</h3>
+
+<ul>
+<li><code>:BundleInstall</code></li>
+<li><code>:BundleUpdate</code></li>
+<li><code>:BundleClean</code></li>
+<li><code>:BundleList</code></li>
+<li><code>:BundleSearch</code></li>
+</ul>
+
+<h3 id="code">code</h3>
+
+<ul>
+<li><p><code>Ctrl-I</code> or <code>gf</code>  go to a file under the cursor</p></li>
+
+<li><p><code>Ctrl-O</code> go to previous file</p></li>
+</ul>
+
+<h3 id="skills">skills</h3>
+
+<ul>
+<li><p>add comment to code</p>
+
+<ol>
+<li><code>v</code> virtual mode, select target</li>
+<li>【Control + v】</li>
+<li><code>I</code></li>
+<li><code>//</code></li>
+<li>【ESC】 + 【ESC】</li>
+</ol></li>
+
+<li><p>replace word
+<code>:%s/foo/bar/g</code></p></li>
 </ul>
 
   </div>
@@ -156,11 +143,13 @@ Ctrl-b d
 <section id="menu-pane" class="row menu text-center">
   
   
+  <span><a class="menu-item" href="//hongxuanlee.github.io/blog/tmux/">&lt; prev | </a></span>
+  
   
   <span><a class="menu-item" href="/blog">blog</a></span>
   
   
-  <span><a class="menu-item" href="//hongxuanlee.github.io/blog/vim/"> | next &gt;</a></span>
+  <span><a class="menu-item" href="//hongxuanlee.github.io/blog/hack_node/"> | next &gt;</a></span>
   
   
   <h4 class="text-center"><a class="menu-item" href="//hongxuanlee.github.io">home</a></h4>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<meta name="description" content="Simple minimalist theme">
+<meta name="keywords" content="minimalist,blog,goa,hugo,developer">
+
+<base href="//hongxuanlee.github.io">
+
+<title>Akatruki</title>
+
+<meta name="generator" content="Hugo 0.18.1" />
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400|Roboto+Slab:400,700|Roboto:300,300i,400,400i,500,500i,700,700i">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+<link rel="stylesheet" href="//hongxuanlee.github.io/css/main.css">
+
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="theme-color" content="#ffffff">
+
+</head>
+<body lang="en-us">
+<div class="container">
+
+
+<header class="row text-left title">
+  <h1 class="title">我的tmux常用操作</h1>
+</header>
+<section id="category-pane" class="row meta">
+  
+  <div class="col-md-12">
+    <h6 class="text-left meta">
+      PUBLISHED ON JAN 24, 2017 
+    </h6>
+  </div>
+  
+</section>
+<section id="content-pane" class="row">
+  <div class="col-md-12 text-justify content">
+    
+
+<h2 id="tmux-shortcut">tmux shortcut</h2>
+
+<h3 id="via-shortcut">Via shortcut</h3>
+
+<pre><code>Ctrl-b s
+</code></pre>
+
+<h3 id="via-tmux-command">via tmux command</h3>
+
+<pre><code>tmux ls
+</code></pre>
+
+<h3 id="scroll">scroll</h3>
+
+<pre><code>// first
+prefix + [ 
+//secont
+fn + &lt;arrow&gt;
+</code></pre>
+
+<h3 id="create-a-new-session">create a new session</h3>
+
+<pre><code>tmux new -s session-name
+tmux new
+</code></pre>
+
+<h3 id="attaching-to-an-existing-session">attaching to an existing session</h3>
+
+<pre><code>tmux a // connect you to the first available session
+tmux a -t session-name
+</code></pre>
+
+<h3 id="detaching-from-a-session">detaching from a session</h3>
+
+<pre><code>tmux detach
+// or shortcut
+Ctrl-b d 
+</code></pre>
+
+<h3 id="killing-a-session">killing a session</h3>
+
+<pre><code>tmux kill-session -t session-name
+</code></pre>
+
+<h3 id="project">project</h3>
+
+<ul>
+<li><code>prefix + option + [arrow key]</code> adjust the window size</li>
+<li><code>z</code> magnify current window</li>
+</ul>
+
+<h3 id="configuration">configuration</h3>
+
+<ul>
+<li>~/.tmux.conf</li>
+<li>see ./tmux.conf</li>
+</ul>
+
+<h3 id="windows">windows</h3>
+
+<ul>
+<li><code>c</code> create a new window</li>
+<li><code>,</code> rename the current window</li>
+<li><code>q</code> command-prompt &ldquo;move-window -t &lsquo;%%&rsquo;&rdquo;</li>
+<li><code>w</code> list windows</li>
+<li><code>%</code> split horizontally</li>
+<li><code>&quot;</code> split vertically</li>
+<li><code>n</code> change to the next window</li>
+<li><code>p</code> change to the previous window</li>
+<li><code>0 to 9</code> select windows 0 through 9</li>
+<li><code>&amp;</code> kill window</li>
+</ul>
+
+<h3 id="panes">Panes</h3>
+
+<ul>
+<li><code>%</code> create a horizontal pane</li>
+<li><code>&quot;</code> create a vertical pane</li>
+<li><code>q</code> show pane numbers</li>
+<li><code>o</code> toggle between panes !!!</li>
+<li><code>}</code> swap with next pane</li>
+<li><code>{</code> swap with previous pane</li>
+<li><code>!</code> break the pane out of the window / force quit current pane</li>
+<li><code>x</code> kill the current pane, it&rsquo;s will ask Y/N</li>
+<li><code>q</code> show pane list</li>
+</ul>
+
+  </div>
+</section>
+
+
+
+
+
+
+
+
+<section id="menu-pane" class="row menu text-center">
+  
+  
+  <span><a class="menu-item" href="//hongxuanlee.github.io/blog/hack_node/">&lt; prev | </a></span>
+  
+  
+  <span><a class="menu-item" href="/blog">blog</a></span>
+  
+  
+  
+  <h4 class="text-center"><a class="menu-item" href="//hongxuanlee.github.io">home</a></h4>
+</section>
+
+
+
+<footer class="row text-center footer">
+  <hr />
+  
+  <h6 class="text-center copyright">© 2016. KinoLee. <a href="http://creativecommons.org/licenses/by/3.0/">Some Rights Reserved</a>.</h6>
+  
+  <h6 class="text-center powered">Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/shenoybr/hugo-goa">Goa</a>.</h6>
+  
+  
+</footer>
+
+</div>
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
+
+

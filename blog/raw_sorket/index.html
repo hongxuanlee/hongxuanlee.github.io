@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<meta name="description" content="Simple minimalist theme">
+<meta name="keywords" content="minimalist,blog,goa,hugo,developer">
+
+<base href="//hongxuanlee.github.io">
+
+<title>Akatruki</title>
+
+<meta name="generator" content="Hugo 0.18.1" />
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400|Roboto+Slab:400,700|Roboto:300,300i,400,400i,500,500i,700,700i">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+<link rel="stylesheet" href="//hongxuanlee.github.io/css/main.css">
+
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="theme-color" content="#ffffff">
+
+</head>
+<body lang="en-us">
+<div class="container">
+
+
+<header class="row text-left title">
+  <h1 class="title">在C中使用raw sorket进行IP包转发</h1>
+</header>
+<section id="category-pane" class="row meta">
+  
+  <div class="col-md-12">
+    <h6 class="text-left meta">
+      PUBLISHED ON MAR 25, 2017 
+    </h6>
+  </div>
+  
+</section>
+<section id="content-pane" class="row">
+  <div class="col-md-12 text-justify content">
+    
+
+<p>一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。在这里，我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。</p>
+
+<p>在阅读这篇文章及案例前，需要对OSI网络模型有些基本的了解，tcp和ip头部信息结构可以看看对应的维基，在此我就不再赘述了。</p>
+
+<ul>
+<li><p>ipV4:</p>
+
+<p><a href="https://en.wikipedia.org/wiki/IPv4#Header">https://en.wikipedia.org/wiki/IPv4#Header</a></p></li>
+
+<li><p>tcp:
+   <a href="https://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_segment_structure">https://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_segment_structure</a></p></li>
+</ul>
+
+<h3 id="raw-socket">raw socket</h3>
+
+<p>那么, 什么是raw-socket呢？他跟普通的socket有什么不同?</p>
+
+<p>详细介绍可以看这里：<a href="https://linux.die.net/man/7/raw">https://linux.die.net/man/7/raw</a></p>
+
+<p>简单的说，raw socket和其他socket操作是类似的，只是他支持发送和接受不包含链路层头部的原生ip报文。</p>
+
+<p>就tcp来说，经过系统级三次握手从而建立连接之后，tcp socket接受到的是stream，而如果使用raw socket拿到则是从握手开始的最基本的IP包。</p>
+
+<h3 id="使用步骤">使用步骤</h3>
+
+<ul>
+<li>创建raw socket（如果不想规定类型是TCP，将IPPROTO_TCP换成IPPROTO_IP）</li>
+</ul>
+
+<pre><code class="language-c">   int s = socket (PF_INET, SOCK_RAW, IPPROTO_TCP);
+   if(s == -1)
+    {
+        perror(&quot;Failed to create socket&quot;);
+    }
+</code></pre>
+
+<ul>
+<li>将socket option中的IP_HDRINCL设置为1，这样才能发包（如果只需要抓包不需要这一步）</li>
+</ul>
+
+<pre><code class="language-c">  if (setsockopt (s, IPPROTO_IP, IP_HDRINCL, val, sizeof (one)) &lt; 0)
+    {
+        perror(&quot;Error setting IP_HDRINCL&quot;);
+    }
+</code></pre>
+
+<ul>
+<li>将socket的recvfrom置于无限循环中，这样便能无限抓包 （如果只需要发包不需要这一步）</li>
+</ul>
+
+<pre><code class="language-c++">  struct sockaddr_in serverProxy;
+  u_char raw_Buffer[1024];
+  int saddr_size = sizeof serverProxy;
+  int data_size = recvfrom(s , raw_Buffer , 1024, 0 , (struct sockaddr *)&amp;serverProxy , &amp;saddr_size);
+
+  if(data_size &lt; 0)
+  {
+     printf(&quot;Recvfrom error , failed to get packets\n&quot;);
+     return 1;
+  }
+  //Now process the packet
+  ProcessPacket(raw_Buffer , data_size, s);
+</code></pre>
+
+<ul>
+<li>构造ip包后即可发包(IP包篡改可具体看后面案例，现在假设IP包已经构造好了，buffer是报文，iph是ip头部信息，tcph是tcp的头部信息)</li>
+</ul>
+
+<pre><code class="language-c">    struct sockaddr_in dest_addr;
+    dest_addr.sin_family = AF_INET;
+    dest_addr.sin_port = tcph -&gt; dest;
+    dest_addr.sin_addr.s_addr = iph -&gt; daddr;
+
+    if (sendto (s, buffer, ntohs(iph -&gt; tot_len),  0, (struct sockaddr *) &amp;dest_addr, sizeof (dest_addr)) &lt; 0)
+    {
+        perror(&quot;sendto failed&quot;);
+    }
+    else
+    {
+        printf (&quot;Packet Send. Length : %d \n&quot; , ntohs(iph -&gt; tot_len));
+    }
+
+</code></pre>
+
+<h3 id="使用案例">使用案例</h3>
+
+<p>demo必须功能简单，实现的场景如下：</p>
+
+<ol>
+<li><p>A向B的端口55555发出http请求（curl）</p></li>
+
+<li><p>B通过raw socket嗅探到包，通过ip头部、tcp头部内容的提取，拿到目标端口为55555的包</p></li>
+
+<li><p>将目标IP，源IP，目标端口，源端口（修改成端口55556）修改后，重新生成IP头部校验和、TCP头部校验和。生成最终的IP包</p></li>
+
+<li><p>使用raw socket将篡改后IP报文发送给真实的http服务机器C。</p></li>
+
+<li><p>raw socket嗅探到包，拿到目标端口为55556的包，类似3步骤将报文修改后发回给A</p></li>
+
+<li><p>最后经过几次IP包的转发后，A可以拿到C的返回内容。</p></li>
+</ol>
+
+<p>实际代码见：</p>
+
+<p><a href="https://github.com/hongxuanlee/simple_raw_socket">https://github.com/hongxuanlee/simple_raw_socket</a></p>
+
+<p>(该案例由于使用了linux系统内置的ip、tcp库，所以不支持mac系统)</p>
+
+<h3 id="如何调试">如何调试</h3>
+
+<ul>
+<li><p>tcpdump: <a href="https://danielmiessler.com/study/tcpdump/">https://danielmiessler.com/study/tcpdump/</a> （命令行）</p></li>
+
+<li><p>wireshark: <a href="https://www.wireshark.org/">https://www.wireshark.org/</a>  （应用）</p></li>
+</ul>
+
+  </div>
+</section>
+
+
+
+
+
+
+
+
+<section id="menu-pane" class="row menu text-center">
+  
+  
+  <span><a class="menu-item" href="//hongxuanlee.github.io/blog/vim/">&lt; prev | </a></span>
+  
+  
+  <span><a class="menu-item" href="/blog">blog</a></span>
+  
+  
+  
+  <h4 class="text-center"><a class="menu-item" href="//hongxuanlee.github.io">home</a></h4>
+</section>
+
+
+
+<footer class="row text-center footer">
+  <hr />
+  
+  <h6 class="text-center copyright">© 2016. KinoLee. <a href="http://creativecommons.org/licenses/by/3.0/">Some Rights Reserved</a>.</h6>
+  
+  <h6 class="text-center powered">Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/shenoybr/hugo-goa">Goa</a>.</h6>
+  
+  
+</footer>
+
+</div>
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
+
+

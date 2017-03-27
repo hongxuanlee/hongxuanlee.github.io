@@ -6,13 +6,320 @@
     <description>Recent content in Blogs on Akatruki</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 13 Jan 2017 22:08:22 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 25 Mar 2017 00:19:18 +0800</lastBuildDate>
     <atom:link href="//hongxuanlee.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>在C中使用raw sorket进行IP包转发</title>
+      <link>//hongxuanlee.github.io/blog/raw_sorket/</link>
+      <pubDate>Sat, 25 Mar 2017 00:19:18 +0800</pubDate>
+      
+      <guid>//hongxuanlee.github.io/blog/raw_sorket/</guid>
+      <description>
+
+&lt;p&gt;一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。在这里，我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。&lt;/p&gt;
+
+&lt;p&gt;在阅读这篇文章及案例前，需要对OSI网络模型有些基本的了解，tcp和ip头部信息结构可以看看对应的维基，在此我就不再赘述了。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;ipV4:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/IPv4#Header&#34;&gt;https://en.wikipedia.org/wiki/IPv4#Header&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;tcp:
+   &lt;a href=&#34;https://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_segment_structure&#34;&gt;https://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_segment_structure&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;raw-socket&#34;&gt;raw socket&lt;/h3&gt;
+
+&lt;p&gt;那么, 什么是raw-socket呢？他跟普通的socket有什么不同?&lt;/p&gt;
+
+&lt;p&gt;详细介绍可以看这里：&lt;a href=&#34;https://linux.die.net/man/7/raw&#34;&gt;https://linux.die.net/man/7/raw&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;简单的说，raw socket和其他socket操作是类似的，只是他支持发送和接受不包含链路层头部的原生ip报文。&lt;/p&gt;
+
+&lt;p&gt;就tcp来说，经过系统级三次握手从而建立连接之后，tcp socket接受到的是stream，而如果使用raw socket拿到则是从握手开始的最基本的IP包。&lt;/p&gt;
+
+&lt;h3 id=&#34;使用步骤&#34;&gt;使用步骤&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;创建raw socket（如果不想规定类型是TCP，将IPPROTO_TCP换成IPPROTO_IP）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;   int s = socket (PF_INET, SOCK_RAW, IPPROTO_TCP);
+   if(s == -1)
+    {
+        perror(&amp;quot;Failed to create socket&amp;quot;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;将socket option中的IP_HDRINCL设置为1，这样才能发包（如果只需要抓包不需要这一步）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;  if (setsockopt (s, IPPROTO_IP, IP_HDRINCL, val, sizeof (one)) &amp;lt; 0)
+    {
+        perror(&amp;quot;Error setting IP_HDRINCL&amp;quot;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;将socket的recvfrom置于无限循环中，这样便能无限抓包 （如果只需要发包不需要这一步）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c++&#34;&gt;  struct sockaddr_in serverProxy;
+  u_char raw_Buffer[1024];
+  int saddr_size = sizeof serverProxy;
+  int data_size = recvfrom(s , raw_Buffer , 1024, 0 , (struct sockaddr *)&amp;amp;serverProxy , &amp;amp;saddr_size);
+
+  if(data_size &amp;lt; 0)
+  {
+     printf(&amp;quot;Recvfrom error , failed to get packets\n&amp;quot;);
+     return 1;
+  }
+  //Now process the packet
+  ProcessPacket(raw_Buffer , data_size, s);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;构造ip包后即可发包(IP包篡改可具体看后面案例，现在假设IP包已经构造好了，buffer是报文，iph是ip头部信息，tcph是tcp的头部信息)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;    struct sockaddr_in dest_addr;
+    dest_addr.sin_family = AF_INET;
+    dest_addr.sin_port = tcph -&amp;gt; dest;
+    dest_addr.sin_addr.s_addr = iph -&amp;gt; daddr;
+
+    if (sendto (s, buffer, ntohs(iph -&amp;gt; tot_len),  0, (struct sockaddr *) &amp;amp;dest_addr, sizeof (dest_addr)) &amp;lt; 0)
+    {
+        perror(&amp;quot;sendto failed&amp;quot;);
+    }
+    else
+    {
+        printf (&amp;quot;Packet Send. Length : %d \n&amp;quot; , ntohs(iph -&amp;gt; tot_len));
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;使用案例&#34;&gt;使用案例&lt;/h3&gt;
+
+&lt;p&gt;demo必须功能简单，实现的场景如下：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;A向B的端口55555发出http请求（curl）&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;B通过raw socket嗅探到包，通过ip头部、tcp头部内容的提取，拿到目标端口为55555的包&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;将目标IP，源IP，目标端口，源端口（修改成端口55556）修改后，重新生成IP头部校验和、TCP头部校验和。生成最终的IP包&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;使用raw socket将篡改后IP报文发送给真实的http服务机器C。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;raw socket嗅探到包，拿到目标端口为55556的包，类似3步骤将报文修改后发回给A&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;最后经过几次IP包的转发后，A可以拿到C的返回内容。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;实际代码见：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/hongxuanlee/simple_raw_socket&#34;&gt;https://github.com/hongxuanlee/simple_raw_socket&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;(该案例由于使用了linux系统内置的ip、tcp库，所以不支持mac系统)&lt;/p&gt;
+
+&lt;h3 id=&#34;如何调试&#34;&gt;如何调试&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;tcpdump: &lt;a href=&#34;https://danielmiessler.com/study/tcpdump/&#34;&gt;https://danielmiessler.com/study/tcpdump/&lt;/a&gt; （命令行）&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;wireshark: &lt;a href=&#34;https://www.wireshark.org/&#34;&gt;https://www.wireshark.org/&lt;/a&gt;  （应用）&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>我的vim常用操作</title>
+      <link>//hongxuanlee.github.io/blog/vim/</link>
+      <pubDate>Fri, 25 Nov 2016 00:21:16 +0800</pubDate>
+      
+      <guid>//hongxuanlee.github.io/blog/vim/</guid>
+      <description>
+
+&lt;h3 id=&#34;move&#34;&gt;move&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;0&lt;/code&gt; jump to line header&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;^&lt;/code&gt; jump to line header without blank&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;$&lt;/code&gt; jump to end of line&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;w&lt;/code&gt; skip next word head&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;e&lt;/code&gt; skip next word end&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;%&lt;/code&gt; jump match brackets&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;*&lt;/code&gt; jump to next same word with cursor&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;#&lt;/code&gt; jump to previous same word with cursor&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;f&amp;lt;letter&amp;gt;&lt;/code&gt; jump to letter  eg: fa&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&amp;lt;num&amp;gt;f&amp;lt;letter&amp;gt;&lt;/code&gt; jump to letter appear third time eg: 3fa&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;insert&#34;&gt;insert&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;o&lt;/code&gt; insert new line&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;O&lt;/code&gt; insert new line above current line&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;a&lt;/code&gt; insert after cursor&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cw&lt;/code&gt; replace cursor to word end&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;operation&#34;&gt;operation&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.&lt;/code&gt; repeat last operation&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;N&amp;lt;command&amp;gt;&lt;/code&gt; repeat cmmand N&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:suspend&lt;/code&gt; &lt;code&gt;ctrl + z&lt;/code&gt; suspend&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;fg&lt;/code&gt; recover suspend&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;delete&#34;&gt;delete&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;de&lt;/code&gt; delete word&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;plugin&#34;&gt;plugin&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;:BundleInstall&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:BundleUpdate&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:BundleClean&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:BundleList&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:BundleSearch&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;code&#34;&gt;code&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;Ctrl-I&lt;/code&gt; or &lt;code&gt;gf&lt;/code&gt;  go to a file under the cursor&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;code&gt;Ctrl-O&lt;/code&gt; go to previous file&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;skills&#34;&gt;skills&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;add comment to code&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;v&lt;/code&gt; virtual mode, select target&lt;/li&gt;
+&lt;li&gt;【Control + v】&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;I&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;//&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;【ESC】 + 【ESC】&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;replace word
+&lt;code&gt;:%s/foo/bar/g&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>我的tmux常用操作</title>
+      <link>//hongxuanlee.github.io/blog/tmux/</link>
+      <pubDate>Thu, 24 Nov 2016 16:53:40 +0800</pubDate>
+      
+      <guid>//hongxuanlee.github.io/blog/tmux/</guid>
+      <description>
+
+&lt;h2 id=&#34;tmux-shortcut&#34;&gt;tmux shortcut&lt;/h2&gt;
+
+&lt;h3 id=&#34;via-shortcut&#34;&gt;Via shortcut&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;Ctrl-b s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;via-tmux-command&#34;&gt;via tmux command&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;tmux ls
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;scroll&#34;&gt;scroll&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;// first
+prefix + [ 
+//secont
+fn + &amp;lt;arrow&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;create-a-new-session&#34;&gt;create a new session&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;tmux new -s session-name
+tmux new
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;attaching-to-an-existing-session&#34;&gt;attaching to an existing session&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;tmux a // connect you to the first available session
+tmux a -t session-name
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;detaching-from-a-session&#34;&gt;detaching from a session&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;tmux detach
+// or shortcut
+Ctrl-b d 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;killing-a-session&#34;&gt;killing a session&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;tmux kill-session -t session-name
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;project&#34;&gt;project&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;prefix + option + [arrow key]&lt;/code&gt; adjust the window size&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;z&lt;/code&gt; magnify current window&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;configuration&#34;&gt;configuration&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;~/.tmux.conf&lt;/li&gt;
+&lt;li&gt;see ./tmux.conf&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;windows&#34;&gt;windows&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;c&lt;/code&gt; create a new window&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;,&lt;/code&gt; rename the current window&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;q&lt;/code&gt; command-prompt &amp;ldquo;move-window -t &amp;lsquo;%%&amp;rsquo;&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;w&lt;/code&gt; list windows&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;%&lt;/code&gt; split horizontally&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&amp;quot;&lt;/code&gt; split vertically&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;n&lt;/code&gt; change to the next window&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;p&lt;/code&gt; change to the previous window&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;0 to 9&lt;/code&gt; select windows 0 through 9&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&amp;amp;&lt;/code&gt; kill window&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;panes&#34;&gt;Panes&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;%&lt;/code&gt; create a horizontal pane&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&amp;quot;&lt;/code&gt; create a vertical pane&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;q&lt;/code&gt; show pane numbers&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;o&lt;/code&gt; toggle between panes !!!&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;}&lt;/code&gt; swap with next pane&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;{&lt;/code&gt; swap with previous pane&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;!&lt;/code&gt; break the pane out of the window / force quit current pane&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;x&lt;/code&gt; kill the current pane, it&amp;rsquo;s will ask Y/N&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;q&lt;/code&gt; show pane list&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>如何hack node模块</title>
       <link>//hongxuanlee.github.io/blog/hack_node/</link>
-      <pubDate>Fri, 13 Jan 2017 22:08:22 +0800</pubDate>
+      <pubDate>Tue, 15 Nov 2016 22:08:22 +0800</pubDate>
       
       <guid>//hongxuanlee.github.io/blog/hack_node/</guid>
       <description>
@@ -356,187 +663,6 @@ require.cache[requireId].exports = (options) =&amp;gt; {
 const defPath = which(&#39;def&#39;).stdout;
 require(defPath);
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>我的vim常用操作</title>
-      <link>//hongxuanlee.github.io/blog/vim/</link>
-      <pubDate>Fri, 25 Nov 2016 00:21:16 +0800</pubDate>
-      
-      <guid>//hongxuanlee.github.io/blog/vim/</guid>
-      <description>
-
-&lt;h3 id=&#34;move&#34;&gt;move&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;0&lt;/code&gt; jump to line header&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;^&lt;/code&gt; jump to line header without blank&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;$&lt;/code&gt; jump to end of line&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;w&lt;/code&gt; skip next word head&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;e&lt;/code&gt; skip next word end&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;%&lt;/code&gt; jump match brackets&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;*&lt;/code&gt; jump to next same word with cursor&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;#&lt;/code&gt; jump to previous same word with cursor&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;f&amp;lt;letter&amp;gt;&lt;/code&gt; jump to letter  eg: fa&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;&amp;lt;num&amp;gt;f&amp;lt;letter&amp;gt;&lt;/code&gt; jump to letter appear third time eg: 3fa&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;insert&#34;&gt;insert&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;o&lt;/code&gt; insert new line&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;O&lt;/code&gt; insert new line above current line&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;a&lt;/code&gt; insert after cursor&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;cw&lt;/code&gt; replace cursor to word end&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;operation&#34;&gt;operation&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;.&lt;/code&gt; repeat last operation&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;N&amp;lt;command&amp;gt;&lt;/code&gt; repeat cmmand N&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;:suspend&lt;/code&gt; &lt;code&gt;ctrl + z&lt;/code&gt; suspend&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;fg&lt;/code&gt; recover suspend&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;delete&#34;&gt;delete&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;de&lt;/code&gt; delete word&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;plugin&#34;&gt;plugin&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;:BundleInstall&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;:BundleUpdate&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;:BundleClean&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;:BundleList&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;:BundleSearch&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;code&#34;&gt;code&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;code&gt;Ctrl-I&lt;/code&gt; or &lt;code&gt;gf&lt;/code&gt;  go to a file under the cursor&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;&lt;code&gt;Ctrl-O&lt;/code&gt; go to previous file&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;skills&#34;&gt;skills&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;add comment to code&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;code&gt;v&lt;/code&gt; virtual mode, select target&lt;/li&gt;
-&lt;li&gt;【Control + v】&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;I&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;//&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;【ESC】 + 【ESC】&lt;/li&gt;
-&lt;/ol&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;replace word
-&lt;code&gt;:%s/foo/bar/g&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>我的tmux常用操作</title>
-      <link>//hongxuanlee.github.io/blog/tmux/</link>
-      <pubDate>Thu, 24 Nov 2016 16:53:40 +0800</pubDate>
-      
-      <guid>//hongxuanlee.github.io/blog/tmux/</guid>
-      <description>
-
-&lt;h2 id=&#34;tmux-shortcut&#34;&gt;tmux shortcut&lt;/h2&gt;
-
-&lt;h3 id=&#34;via-shortcut&#34;&gt;Via shortcut&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;Ctrl-b s
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;via-tmux-command&#34;&gt;via tmux command&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;tmux ls
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;scroll&#34;&gt;scroll&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;// first
-prefix + [ 
-//secont
-fn + &amp;lt;arrow&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;create-a-new-session&#34;&gt;create a new session&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;tmux new -s session-name
-tmux new
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;attaching-to-an-existing-session&#34;&gt;attaching to an existing session&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;tmux a // connect you to the first available session
-tmux a -t session-name
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;detaching-from-a-session&#34;&gt;detaching from a session&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;tmux detach
-// or shortcut
-Ctrl-b d 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;killing-a-session&#34;&gt;killing a session&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;tmux kill-session -t session-name
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;project&#34;&gt;project&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;prefix + option + [arrow key]&lt;/code&gt; adjust the window size&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;z&lt;/code&gt; magnify current window&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;configuration&#34;&gt;configuration&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;~/.tmux.conf&lt;/li&gt;
-&lt;li&gt;see ./tmux.conf&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;windows&#34;&gt;windows&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;c&lt;/code&gt; create a new window&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;,&lt;/code&gt; rename the current window&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;q&lt;/code&gt; command-prompt &amp;ldquo;move-window -t &amp;lsquo;%%&amp;rsquo;&amp;rdquo;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;w&lt;/code&gt; list windows&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;%&lt;/code&gt; split horizontally&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;&amp;quot;&lt;/code&gt; split vertically&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;n&lt;/code&gt; change to the next window&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;p&lt;/code&gt; change to the previous window&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;0 to 9&lt;/code&gt; select windows 0 through 9&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;&amp;amp;&lt;/code&gt; kill window&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;panes&#34;&gt;Panes&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;%&lt;/code&gt; create a horizontal pane&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;&amp;quot;&lt;/code&gt; create a vertical pane&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;q&lt;/code&gt; show pane numbers&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;o&lt;/code&gt; toggle between panes !!!&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;}&lt;/code&gt; swap with next pane&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;{&lt;/code&gt; swap with previous pane&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;!&lt;/code&gt; break the pane out of the window / force quit current pane&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;x&lt;/code&gt; kill the current pane, it&amp;rsquo;s will ask Y/N&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;q&lt;/code&gt; show pane list&lt;/li&gt;
-&lt;/ul&gt;
 </description>
     </item>
     

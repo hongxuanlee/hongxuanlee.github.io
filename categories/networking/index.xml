@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Networking on Akatruki</title>
+    <link>//hongxuanlee.github.io/categories/networking/index.xml</link>
+    <description>Recent content in Networking on Akatruki</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <atom:link href="//hongxuanlee.github.io/categories/networking/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>在C中使用raw sorket进行IP包转发</title>
+      <link>//hongxuanlee.github.io/2017/03/raw_sorket/</link>
+      <pubDate>Sat, 25 Mar 2017 00:19:18 +0800</pubDate>
+      
+      <guid>//hongxuanlee.github.io/2017/03/raw_sorket/</guid>
+      <description>&lt;p&gt;一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。在这里，我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。&lt;/p&gt;
+
+&lt;p&gt;在阅读这篇文章及案例前，需要对OSI网络模型有些基本的了解，tcp,ip,http头部信息结构可以看看对应的维基，在此我就不再赘述了。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;IpV4:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/IPv4#Header&#34;&gt;https://en.wikipedia.org/wiki/IPv4#Header&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Tcp:
+   &lt;a href=&#34;https://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_segment_structure&#34;&gt;https://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_segment_structure&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Http-request-header:
+   &lt;a href=&#34;https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Request_fields&#34;&gt;https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Request_fields&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;raw-socket&#34;&gt;raw socket&lt;/h3&gt;
+
+&lt;p&gt;那么, 什么是raw-socket呢？他跟普通的socket有什么不同?&lt;/p&gt;
+
+&lt;p&gt;详细介绍可以看这里：&lt;a href=&#34;https://linux.die.net/man/7/raw&#34;&gt;https://linux.die.net/man/7/raw&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;简单的说，raw socket和其他socket操作是类似的，只是他支持发送和接受不包含链路层头部的原生ip报文。&lt;/p&gt;
+
+&lt;p&gt;就tcp来说，经过系统级三次握手从而建立连接之后，tcp socket接受到的是stream，而如果使用raw socket拿到则是从握手开始的最基本的IP包。&lt;/p&gt;
+
+&lt;h3 id=&#34;使用步骤&#34;&gt;使用步骤&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;创建raw socket（如果不想规定类型是TCP，将IPPROTO_TCP换成IPPROTO_IP）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;   int s = socket (PF_INET, SOCK_RAW, IPPROTO_TCP);
+   if(s == -1)
+    {
+        perror(&amp;quot;Failed to create socket&amp;quot;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;将socket option中的IP_HDRINCL设置为1，这样才能发包（如果只需要抓包不需要这一步）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;  if (setsockopt (s, IPPROTO_IP, IP_HDRINCL, val, sizeof (one)) &amp;lt; 0)
+    {
+        perror(&amp;quot;Error setting IP_HDRINCL&amp;quot;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;将socket的recvfrom置于无限循环中，这样便能无限抓包 （如果只需要发包不需要这一步）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c++&#34;&gt;  struct sockaddr_in serverProxy;
+  u_char raw_Buffer[1024];
+  int saddr_size = sizeof serverProxy;
+  int data_size = recvfrom(s , raw_Buffer , 1024, 0 , (struct sockaddr *)&amp;amp;serverProxy , &amp;amp;saddr_size);
+
+  if(data_size &amp;lt; 0)
+  {
+     printf(&amp;quot;Recvfrom error , failed to get packets\n&amp;quot;);
+     return 1;
+  }
+  //Now process the packet
+  ProcessPacket(raw_Buffer , data_size, s);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;构造ip包后即可发包(IP包篡改可具体看后面案例，现在假设IP包已经构造好了，buffer是报文，iph是ip头部信息，tcph是tcp的头部信息)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;    struct sockaddr_in dest_addr;
+    dest_addr.sin_family = AF_INET;
+    dest_addr.sin_port = tcph -&amp;gt; dest;
+    dest_addr.sin_addr.s_addr = iph -&amp;gt; daddr;
+
+    if (sendto (s, buffer, ntohs(iph -&amp;gt; tot_len),  0, (struct sockaddr *) &amp;amp;dest_addr, sizeof (dest_addr)) &amp;lt; 0)
+    {
+        perror(&amp;quot;sendto failed&amp;quot;);
+    }
+    else
+    {
+        printf (&amp;quot;Packet Send. Length : %d \n&amp;quot; , ntohs(iph -&amp;gt; tot_len));
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;使用案例&#34;&gt;使用案例&lt;/h3&gt;
+
+&lt;p&gt;demo必须功能简单，实现的场景如下：&lt;/p&gt;
+
+&lt;p&gt;A为client, B为代理机器，C为真实http server。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;B的raw socket服务启动，监听所有发至端口55555和55556的类型为tcp的IP包&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;A向B的端口55555发出http请求（curl）&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;B通过raw socket嗅探到发至端口55555包，提取ip头部、tcp头部内容。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;将目标IP修改成C的IP，源IP修改成B的IP，目标端口修改成C的服务端口，储存A的端口号，将源端口修改成55556&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;若该IP包含http请求，将&lt;code&gt;Host: B的IP:55555&lt;/code&gt; 修改成&lt;code&gt;Host: C的IP:C的端口&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;重新生成IP头部校验和、TCP头部校验和，生成最终的IP包。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;使用raw socket将篡改后IP报文发送给真实的http服务机器C。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;B通过raw socket嗅探到发至端口55556包，提取ip头部、tcp头部内容。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;将目标IP修改成A的IP，源IP修改成B的IP，目标端口修改成A的端口，源端口修改成55555，重复6操作，将IP包发至A。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;重复以上步骤，经过几次IP包的转发后，A可以拿到C的返回内容。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;实际代码见：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/hongxuanlee/simple_raw_socket&#34;&gt;https://github.com/hongxuanlee/simple_raw_socket&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;(该案例由于使用了linux系统内置的ip、tcp库，所以不支持mac系统)&lt;/p&gt;
+
+&lt;h3 id=&#34;如何调试&#34;&gt;如何调试&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;tcpdump: &lt;a href=&#34;https://danielmiessler.com/study/tcpdump/（命令行）&#34;&gt;https://danielmiessler.com/study/tcpdump/（命令行）&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;wireshark: &lt;a href=&#34;https://www.wireshark.org/（应用）&#34;&gt;https://www.wireshark.org/（应用）&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;可能的坑&#34;&gt;可能的坑&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;修改iptables&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;如果你的raw socket未绑定端口。linux 内置的TCP端口握手协议可能会优先你的嗅探器返回RST，解决方案是修改iptables，把RST的请求给禁掉。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo iptables -A OUTPUT -p tcp -m tcp --tcp-flags RST RST -j DROP
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;结束后想移除可以使用以下命令&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo iptables -D OUTPUT -p tcp -m tcp --tcp-flags RST RST -j DROP
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

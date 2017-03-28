@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Vim on Akatruki</title>
+    <link>//hongxuanlee.github.io/tags/vim/index.xml</link>
+    <description>Recent content in Vim on Akatruki</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <atom:link href="//hongxuanlee.github.io/tags/vim/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>我的vim常用操作</title>
+      <link>//hongxuanlee.github.io/2016/11/vim/</link>
+      <pubDate>Fri, 25 Nov 2016 00:21:16 +0800</pubDate>
+      
+      <guid>//hongxuanlee.github.io/2016/11/vim/</guid>
+      <description>&lt;h3 id=&#34;move&#34;&gt;move&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;0&lt;/code&gt; jump to line header&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;^&lt;/code&gt; jump to line header without blank&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;$&lt;/code&gt; jump to end of line&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;w&lt;/code&gt; skip next word head&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;e&lt;/code&gt; skip next word end&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;%&lt;/code&gt; jump match brackets&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;*&lt;/code&gt; jump to next same word with cursor&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;#&lt;/code&gt; jump to previous same word with cursor&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;f&amp;lt;letter&amp;gt;&lt;/code&gt; jump to letter  eg: fa&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&amp;lt;num&amp;gt;f&amp;lt;letter&amp;gt;&lt;/code&gt; jump to letter appear third time eg: 3fa&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;insert&#34;&gt;insert&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;o&lt;/code&gt; insert new line&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;O&lt;/code&gt; insert new line above current line&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;a&lt;/code&gt; insert after cursor&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cw&lt;/code&gt; replace cursor to word end&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;operation&#34;&gt;operation&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.&lt;/code&gt; repeat last operation&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;N&amp;lt;command&amp;gt;&lt;/code&gt; repeat cmmand N&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:suspend&lt;/code&gt; &lt;code&gt;ctrl + z&lt;/code&gt; suspend&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;fg&lt;/code&gt; recover suspend&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;delete&#34;&gt;delete&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;de&lt;/code&gt; delete word&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;plugin&#34;&gt;plugin&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;:BundleInstall&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:BundleUpdate&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:BundleClean&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:BundleList&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:BundleSearch&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;code&#34;&gt;code&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;Ctrl-I&lt;/code&gt; or &lt;code&gt;gf&lt;/code&gt;  go to a file under the cursor&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;code&gt;Ctrl-O&lt;/code&gt; go to previous file&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;skills&#34;&gt;skills&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;add comment to code&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;v&lt;/code&gt; virtual mode, select target&lt;/li&gt;
+&lt;li&gt;【Control + v】&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;I&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;//&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;【ESC】 + 【ESC】&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;replace word
+&lt;code&gt;:%s/foo/bar/g&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

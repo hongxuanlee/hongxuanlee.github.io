@@ -2,28 +2,35 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>//hongxuanlee.github.io/blog/raw_sorket/</loc>
+    <loc>//hongxuanlee.github.io/2017/03/raw_sorket/</loc>
     <lastmod>2017-03-25T00:19:18+08:00</lastmod>
   </url>
   
   <url>
-    <loc>//hongxuanlee.github.io/about/</loc>
-    <lastmod>2017-01-13T22:25:26+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>//hongxuanlee.github.io/blog/vim/</loc>
+    <loc>//hongxuanlee.github.io/2016/11/vim/</loc>
     <lastmod>2016-11-25T00:21:16+08:00</lastmod>
   </url>
   
   <url>
-    <loc>//hongxuanlee.github.io/blog/tmux/</loc>
+    <loc>//hongxuanlee.github.io/2016/11/tmux/</loc>
     <lastmod>2016-11-24T16:53:40+08:00</lastmod>
   </url>
   
   <url>
-    <loc>//hongxuanlee.github.io/blog/hack_node/</loc>
+    <loc>//hongxuanlee.github.io/2016/11/hack_node/</loc>
     <lastmod>2016-11-15T22:08:22+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/archives/2016/</loc>
+    <lastmod>2016-11-25T00:21:16+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/archives/2017/</loc>
+    <lastmod>2017-03-25T00:19:18+08:00</lastmod>
+    <priority>0</priority>
   </url>
   
   <url>
@@ -33,8 +40,101 @@
   </url>
   
   <url>
-    <loc>//hongxuanlee.github.io/blog/</loc>
+    <loc>//hongxuanlee.github.io/archives/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/tags/c/</loc>
     <lastmod>2017-03-25T00:19:18+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/tags/develop/</loc>
+    <lastmod>2016-11-25T00:21:16+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/tags/hack/</loc>
+    <lastmod>2016-11-15T22:08:22+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/tags/linux/</loc>
+    <lastmod>2016-11-25T00:21:16+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/categories/linux/</loc>
+    <lastmod>2016-11-25T00:21:16+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/tags/networking/</loc>
+    <lastmod>2017-03-25T00:19:18+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/categories/networking/</loc>
+    <lastmod>2017-03-25T00:19:18+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/tags/nodejs/</loc>
+    <lastmod>2016-11-15T22:08:22+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/categories/nodejs/</loc>
+    <lastmod>2016-11-15T22:08:22+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/post/</loc>
+    <lastmod>2017-03-25T00:19:18+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/tags/proxy/</loc>
+    <lastmod>2017-03-25T00:19:18+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/tags/raw-socket/</loc>
+    <lastmod>2017-03-25T00:19:18+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/tags/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/tags/tmux/</loc>
+    <lastmod>2016-11-24T16:53:40+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/tags/vim/</loc>
+    <lastmod>2016-11-25T00:21:16+08:00</lastmod>
     <priority>0</priority>
   </url>
   

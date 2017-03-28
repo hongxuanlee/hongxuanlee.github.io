@@ -18,21 +18,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Hugo 0.18.1">
-    <title>Akatruki</title>
+    <title>Nodejs</title>
     <meta name="author" content="kino lee">
     <meta name="keywords" content="">
 
     <link rel="icon" href="//hongxuanlee.github.io/favicon.png">
     
-      <link rel="alternate" type="application/rss+xml" title="RSS" href="//hongxuanlee.github.io/index.xml">
+      <link rel="alternate" type="application/rss+xml" title="RSS" href="//hongxuanlee.github.io/tags/nodejs/index.xml">
     
 
     
     <meta name="description" content="Hugo tranquilpeak theme demo">
     <meta property="og:description" content="Hugo tranquilpeak theme demo">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="Akatruki">
-    <meta property="og:url" content="/">
+    <meta property="og:title" content="Nodejs">
+    <meta property="og:url" content="/tags/nodejs/">
     <meta property="og:site_name" content="Akatruki">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Akatruki">
@@ -198,223 +198,18 @@
 </nav>
 
       
+        
 
+      
       <div id="main" data-behavior="2"
         class="
                hasCoverMetaIn
                ">
-        <section class="postShorten-group main-content-wrap">
-          
-          
+        
+          <section class="postShorten-group main-content-wrap">
             
-  
-    
-      
-        
-      
-    
-  
-
-
-  
-
-<article class="postShorten postShorten--thumbnailimg-bottom" itemscope itemType="http://schema.org/BlogPosting">
-  <div class="postShorten-wrap">
-    
-    <div class="postShorten-header">
-      <h1 class="postShorten-title" itemprop="headline">
-        <a class="link-unstyled" href="//hongxuanlee.github.io/2017/03/raw_sorket/">
-          在C中使用raw sorket进行IP包转发
-        </a>
-      </h1>
-      <div class="postShorten-meta post-meta">
-  
-    <time itemprop="datePublished" datetime="2017-03-25T00:19:18&#43;08:00">
-      
-   25, 2017
-
-    </time>
-  
-  
-  
-  
-    <span></span>
-    
-      <a class="category-link" href="//hongxuanlee.github.io/categories/networking">networking</a>
-    
-  
-
-
-</div>
-
-    </div>
-    <div class="postShorten-excerpt" itemprop="articleBody">
-      <p>
-        一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。在这里，我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。</p>
-
-<p>在阅读这篇文章及案例前，需要对OSI网络模型有些基本的了解，tcp,ip,http头部信息结构可以看看对应的维基，在此我就不再赘述了。</p>
-
-<ul>
-<li><p>IpV4:</p>
-
-<p><a href="https://en.wikipedia.org/wiki/IPv4#Header">https://en.wikipedia.org/wiki/IPv4#Header</a></p></li>
-
-<li><p>Tcp:
-   <a href="https://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_segment_structure">https://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_segment_structure</a></p></li>
-
-<li><p>Http-request-header:
-   <a href="https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Request_fields">https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Request_fields</a></p></li>
-</ul>
-
-<p>
-        <br>
-        <a href="//hongxuanlee.github.io/2017/03/raw_sorket/" class="postShorten-excerpt_link link"></a>
-        
-      </p>
-    </div>
-  </div>
-  
-</article>
-
-          
             
-  
-    
-      
-        
-      
-    
-  
-
-
-  
-
-<article class="postShorten postShorten--thumbnailimg-bottom" itemscope itemType="http://schema.org/BlogPosting">
-  <div class="postShorten-wrap">
-    
-    <div class="postShorten-header">
-      <h1 class="postShorten-title" itemprop="headline">
-        <a class="link-unstyled" href="//hongxuanlee.github.io/2016/11/vim/">
-          我的vim常用操作
-        </a>
-      </h1>
-      <div class="postShorten-meta post-meta">
-  
-    <time itemprop="datePublished" datetime="2016-11-25T00:21:16&#43;08:00">
-      
-   25, 2016
-
-    </time>
-  
-  
-  
-  
-    <span></span>
-    
-      <a class="category-link" href="//hongxuanlee.github.io/categories/linux">linux</a>
-    
-  
-
-
-</div>
-
-    </div>
-    <div class="postShorten-excerpt" itemprop="articleBody">
-      <p>
-        <h3 id="move">move</h3>
-
-<ul>
-<li><code>0</code> jump to line header</li>
-<li><code>^</code> jump to line header without blank</li>
-<li><code>$</code> jump to end of line</li>
-<li><code>w</code> skip next word head</li>
-<li><code>e</code> skip next word end</li>
-<li><code>%</code> jump match brackets</li>
-<li><code>*</code> jump to next same word with cursor</li>
-<li><code>#</code> jump to previous same word with cursor</li>
-<li><code>f&lt;letter&gt;</code> jump to letter  eg: fa</li>
-<li><code>&lt;num&gt;f&lt;letter&gt;</code> jump to letter appear third time eg: 3fa</li>
-</ul>
-
-<p>
-        <br>
-        <a href="//hongxuanlee.github.io/2016/11/vim/" class="postShorten-excerpt_link link"></a>
-        
-      </p>
-    </div>
-  </div>
-  
-</article>
-
-          
-            
-  
-    
-      
-        
-      
-    
-  
-
-
-  
-
-<article class="postShorten postShorten--thumbnailimg-bottom" itemscope itemType="http://schema.org/BlogPosting">
-  <div class="postShorten-wrap">
-    
-    <div class="postShorten-header">
-      <h1 class="postShorten-title" itemprop="headline">
-        <a class="link-unstyled" href="//hongxuanlee.github.io/2016/11/tmux/">
-          我的tmux常用操作
-        </a>
-      </h1>
-      <div class="postShorten-meta post-meta">
-  
-    <time itemprop="datePublished" datetime="2016-11-24T16:53:40&#43;08:00">
-      
-   24, 2016
-
-    </time>
-  
-  
-  
-  
-    <span></span>
-    
-      <a class="category-link" href="//hongxuanlee.github.io/categories/linux">linux</a>
-    
-  
-
-
-</div>
-
-    </div>
-    <div class="postShorten-excerpt" itemprop="articleBody">
-      <p>
-        <h2 id="tmux-shortcut">tmux shortcut</h2>
-
-<h3 id="via-shortcut">Via shortcut</h3>
-
-<pre><code>Ctrl-b s
-</code></pre>
-
-<h3 id="via-tmux-command">via tmux command</h3>
-
-<pre><code>tmux ls
-</code></pre>
-
-<p>
-        <br>
-        <a href="//hongxuanlee.github.io/2016/11/tmux/" class="postShorten-excerpt_link link"></a>
-        
-      </p>
-    </div>
-  </div>
-  
-</article>
-
-          
-            
+              
   
     
       
@@ -478,10 +273,11 @@
   
 </article>
 
-          
-          
+            
+            
 
-        </section>
+          </section>
+        
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
     &copy; 2017 kino lee. 
@@ -711,3 +507,4 @@ $(document).ready(function() {
     
   </body>
 </html>
+

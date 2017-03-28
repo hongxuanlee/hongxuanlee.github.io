@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tmux on Akatruki</title>
+    <link>//hongxuanlee.github.io/tags/tmux/index.xml</link>
+    <description>Recent content in Tmux on Akatruki</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <atom:link href="//hongxuanlee.github.io/tags/tmux/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>我的tmux常用操作</title>
+      <link>//hongxuanlee.github.io/2016/11/tmux/</link>
+      <pubDate>Thu, 24 Nov 2016 16:53:40 +0800</pubDate>
+      
+      <guid>//hongxuanlee.github.io/2016/11/tmux/</guid>
+      <description>&lt;h2 id=&#34;tmux-shortcut&#34;&gt;tmux shortcut&lt;/h2&gt;
+
+&lt;h3 id=&#34;via-shortcut&#34;&gt;Via shortcut&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;Ctrl-b s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;via-tmux-command&#34;&gt;via tmux command&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;tmux ls
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;scroll&#34;&gt;scroll&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;// first
+prefix + [ 
+//secont
+fn + &amp;lt;arrow&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;create-a-new-session&#34;&gt;create a new session&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;tmux new -s session-name
+tmux new
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;attaching-to-an-existing-session&#34;&gt;attaching to an existing session&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;tmux a // connect you to the first available session
+tmux a -t session-name
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;detaching-from-a-session&#34;&gt;detaching from a session&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;tmux detach
+// or shortcut
+Ctrl-b d 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;killing-a-session&#34;&gt;killing a session&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;tmux kill-session -t session-name
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;project&#34;&gt;project&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;prefix + option + [arrow key]&lt;/code&gt; adjust the window size&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;z&lt;/code&gt; magnify current window&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;configuration&#34;&gt;configuration&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;~/.tmux.conf&lt;/li&gt;
+&lt;li&gt;see ./tmux.conf&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;windows&#34;&gt;windows&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;c&lt;/code&gt; create a new window&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;,&lt;/code&gt; rename the current window&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;q&lt;/code&gt; command-prompt &amp;ldquo;move-window -t &amp;lsquo;%%&amp;rsquo;&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;w&lt;/code&gt; list windows&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;%&lt;/code&gt; split horizontally&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&amp;quot;&lt;/code&gt; split vertically&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;n&lt;/code&gt; change to the next window&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;p&lt;/code&gt; change to the previous window&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;0 to 9&lt;/code&gt; select windows 0 through 9&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&amp;amp;&lt;/code&gt; kill window&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;panes&#34;&gt;Panes&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;%&lt;/code&gt; create a horizontal pane&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&amp;quot;&lt;/code&gt; create a vertical pane&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;q&lt;/code&gt; show pane numbers&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;o&lt;/code&gt; toggle between panes !!!&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;}&lt;/code&gt; swap with next pane&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;{&lt;/code&gt; swap with previous pane&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;!&lt;/code&gt; break the pane out of the window / force quit current pane&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;x&lt;/code&gt; kill the current pane, it&amp;rsquo;s will ask Y/N&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;q&lt;/code&gt; show pane list&lt;/li&gt;
+&lt;/ul&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -14,7 +14,7 @@
       <pubDate>Sat, 25 Mar 2017 00:19:18 +0800</pubDate>
       
       <guid>//hongxuanlee.github.io/2017/03/raw_sorket/</guid>
-      <description>&lt;p&gt;一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。在这里，我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。&lt;/p&gt;
+      <description>&lt;p&gt;一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。但有的同学会觉得libpcap太重了，如果只是用于学习和简单调试，在这里我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。&lt;/p&gt;
 
 &lt;p&gt;在阅读这篇文章及案例前，需要对OSI网络模型有些基本的了解，tcp,ip,http头部信息结构可以看看对应的维基，在此我就不再赘述了。&lt;/p&gt;
 
@@ -87,7 +87,8 @@
 &lt;li&gt;构造ip包后即可发包(IP包篡改可具体看后面案例，现在假设IP包已经构造好了，buffer是报文，iph是ip头部信息，tcph是tcp的头部信息)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;    struct sockaddr_in dest_addr;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;while(1){
+    struct sockaddr_in dest_addr;
     dest_addr.sin_family = AF_INET;
     dest_addr.sin_port = tcph -&amp;gt; dest;
     dest_addr.sin_addr.s_addr = iph -&amp;gt; daddr;
@@ -100,6 +101,7 @@
     {
         printf (&amp;quot;Packet Send. Length : %d \n&amp;quot; , ntohs(iph -&amp;gt; tot_len));
     }
+  }
 
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -140,9 +142,9 @@
 &lt;h3 id=&#34;如何调试&#34;&gt;如何调试&lt;/h3&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;tcpdump: &lt;a href=&#34;https://danielmiessler.com/study/tcpdump/（命令行）&#34;&gt;https://danielmiessler.com/study/tcpdump/（命令行）&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;tcpdump（命令行）: &lt;a href=&#34;https://danielmiessler.com/study/tcpdump/&#34;&gt;https://danielmiessler.com/study/tcpdump/&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;wireshark: &lt;a href=&#34;https://www.wireshark.org/（应用）&#34;&gt;https://www.wireshark.org/（应用）&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;wireshark（可视化应用）: &lt;a href=&#34;https://www.wireshark.org/&#34;&gt;https://www.wireshark.org/&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3 id=&#34;可能的坑&#34;&gt;可能的坑&lt;/h3&gt;

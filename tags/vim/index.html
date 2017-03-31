@@ -351,7 +351,7 @@
                   Mar 3, 2017
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><p>一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。在这里，我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。</p>
+              <div class="media-content hide-xs font-merryweather"><p>一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。但有的同学会觉得libpcap太重了，如果只是用于学习和简单调试，在这里我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。</p>
 
 <p>在阅读这篇文章及案例前，需要对OSI网络模型有些基本的了解，tcp,ip,http头部信息结构可以看看对应的维基，在此我就不再赘述了。</p>
 
@@ -366,6 +366,25 @@
 <li><p>Http-request-header:
    <a href="https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Request_fields">https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Request_fields</a></p></li>
 </ul>
+
+<p></p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="//hongxuanlee.github.io/2017/02/node_error_handle/">
+                <h3 class="media-heading">nodeJs错误处理</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Feb 2, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>debug一直是开发者的心头之痛，时常有人吐槽“20%的时间在写代码，而80%的时间都在调试代码”，哪怕项目发布后，一个线上问题也可能需要花很多时间去排查。那么我们如何在开发阶段多花点精力从而减少线上风险以及后续debug的时间投入呢？ 显而易见，增加程序的鲁棒性的方法之一便是的正确的错误处理，下面我将总结下在nodeJs应用中应该如何进行合理的错误处理。</p>
 
 <p></p></div>
             </div>
@@ -468,7 +487,7 @@
          data-message-zero=""
          data-message-one=""
          data-message-other="">
-         4 posts found
+         5 posts found
       </p>
     </div>
   </div>

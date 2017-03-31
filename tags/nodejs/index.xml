@@ -9,6 +9,184 @@
     <atom:link href="//hongxuanlee.github.io/tags/nodejs/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>nodeJs错误处理</title>
+      <link>//hongxuanlee.github.io/2017/02/node_error_handle/</link>
+      <pubDate>Tue, 28 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>//hongxuanlee.github.io/2017/02/node_error_handle/</guid>
+      <description>&lt;p&gt;debug一直是开发者的心头之痛，时常有人吐槽“20%的时间在写代码，而80%的时间都在调试代码”，哪怕项目发布后，一个线上问题也可能需要花很多时间去排查。那么我们如何在开发阶段多花点精力从而减少线上风险以及后续debug的时间投入呢？ 显而易见，增加程序的鲁棒性的方法之一便是的正确的错误处理，下面我将总结下在nodeJs应用中应该如何进行合理的错误处理。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;nodejs异常抛出&#34;&gt;nodeJs异常抛出&lt;/h3&gt;
+
+&lt;p&gt;与其他语言（Java, C++）不一样的情况是，在nodeJs应用中并不会大量的直接使用throw抛出异常，因为nodeJs大部分错误都会出现在异步函数中，同步函数中很少需要抛出异常。&lt;/p&gt;
+
+&lt;p&gt;其中，常见的异步函数的异常抛出方法大概有四种：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;普通回调：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;callback(new Error(&#39;something error&#39;), null);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;promise:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;reject(new Error(&#39;something error&#39;)); 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;throw:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;throw new Error(&#39;something error&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;EventEmitter&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;myEmitter.emit(&#39;error&#39;, new Error(&#39;something error&#39;));
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;同步函数的错误抛出则一般是在&lt;code&gt;JSON.parse&lt;/code&gt;的时候以及一些验证用户输入的情况。&lt;/p&gt;
+
+&lt;h3 id=&#34;错误类型&#34;&gt;错误类型&lt;/h3&gt;
+
+&lt;p&gt;一般来说，错误类型可以分为两种：操作错误（Operational errors），程序错误（Programmer errors）&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;操作错误：这类错误一般跟你的程序本身无关，主要分为两种：一种是用户输入(或环境)问题，还有一种便是依赖外部服务问题（如数据库连接超时，依赖服务请求失败等）&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;程序错误：这种一般来说便是程序bug, 比如没有验证用户输入，变量名使用错误等。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;当然在某些情况下，没有被正确处理的操作错误就是程序错误。 举个简单的栗子，比如数据库连接失败了，这种属于操作错误，然而你并没有对数据库连接失败进行任何处理，那么这就是程序错误了，所以哪怕是操作错误，我们也需要认真对待，并对可能出现的错误进行合理的处理。&lt;/p&gt;
+
+&lt;p&gt;操作错误基本的处理方式有：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;直接处理错误&lt;/li&gt;
+&lt;li&gt;将错误直接传递给client&lt;/li&gt;
+&lt;li&gt;设置阈值的重试&lt;/li&gt;
+&lt;li&gt;log记录&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;最佳实践&#34;&gt;最佳实践&lt;/h3&gt;
+
+&lt;p&gt;结合网上文章和自己的一些踩坑经验，稍微总结一下。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;使用promise对异常进行catch&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;哪怕你的promise的链路过长，最深处的throw也能在最外层catch住:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;doWork()
+ .then(doWork)
+ .then(doOtherWork)
+ .then((result) =&amp;gt; doWork)
+ .catch((error) =&amp;gt; throw error)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但如果你不幸忘记了catch(比如一些promise和generater混用的时候)，那么该nodeJs进程会触发&lt;code&gt;unhandledRejection&lt;/code&gt;这个事件，并结束进程。这个情况在node 6.x的早期版本（以及古老的4.x）是不会主动有任何异常提示，错误就这样被生吞了，很容易导致后续调试困难。所以，为了避免这种情况发生，最好对&lt;code&gt;unhandledRejection&lt;/code&gt;这个事件进行监听，记录相应的错误信息。哪怕你忘记处理promise异常也不会导致在node低版本中吞掉错误。如：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;process.on(&#39;unhandledRejection&#39;, function (error, p) {
+  errlog();
+  throw error;
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;监听uncaughtException事件&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;process.on(&#39;uncaughtException&#39;, function (error) {
+  //I just received an error that was never handled, time to handle it and then decide whether a restart is needed
+  errorManagement.handler.handleError(error);
+  if (!errorManagement.handler.isTrustedError(error))
+    process.exit(1);
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;类型检查&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;有一部分操作错误是来源于用户的输入错误，如果没有及早对用户输入进行类型判断和验证，并抛出异常，那么你的程序也是存在问题的。所以为了合理避免由于输入错误导致其他异常，应该严格按照你的文档规范对输入的变量进行类型检查，并根据你对输入的要求抛出正确的错误类型和错误信息。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;TypeError&lt;/code&gt;、&lt;code&gt;RangeError&lt;/code&gt;的例子:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  if (typeof val !== &#39;number&#39;) {
+    throw new TypeError(`${val} is not a number`);
+  }
+
+  if (val &amp;gt; max || val &amp;lt; min) {
+    throw new RangeError(`${val} is not between ${min} and ${max}`);
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;操作错误和程序错误分别处理。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;如果你的应用重度依赖第三方服务，务必将操作错误和程序错误分开处理。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//marking an error object as operational 
+var myError = new Error(&amp;quot;How can I add new product when no value provided?&amp;quot;);
+myError.isOperational = true;
+ 
+//or if you&#39;re using some centralized error factory (see other examples at the bullet &amp;quot;Use only the built-in Error object&amp;quot;)
+function appError(commonType, description, isOperational) {
+    Error.call(this);
+    Error.captureStackTrace(this);
+    this.commonType = commonType;
+    this.description = description;
+    this.isOperational = isOperational;
+};
+ 
+throw new appError(errorManagement.commonErrors.InvalidInput, &amp;quot;Describe here what happened&amp;quot;, true);
+ 
+//error handling code within middleware
+process.on(&#39;uncaughtException&#39;, function(error) {
+    if(!error.isOperational)
+        process.exit(1);
+});
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;错误集中处理, 但不要在中间件上处理。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;为了防止错误多次重复处理或者错误处理不当，错误处理最好能集中在一个对象上，但不要写在中间件上，因为中间件不能处理非Web接口的错误。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//handling errors within a dedicated object
+module.exports.handler = new errorHandler();
+ 
+function errorHandler(){
+    this.handleError = function (error) {
+        return logger.logError(err).then(sendMailToAdminIfCritical).then(saveInOpsQueueIfCritical).then(determineIfOperationalError);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;总结&#34;&gt;总结&lt;/h3&gt;
+
+&lt;p&gt;提高nodeJs鲁棒性，完善的单测覆盖和合理的错误处理都必不可少。虽然会增加不少开发成本，但对于后续调试、重构以及维护有着不可或缺的作用。&lt;/p&gt;
+
+&lt;p&gt;参考资料:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.joyent.com/node-js/production/design/errors&#34;&gt;https://www.joyent.com/node-js/production/design/errors&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://goldbergyoni.com/checklist-best-practices-of-node-js-error-handling/&#34;&gt;http://goldbergyoni.com/checklist-best-practices-of-node-js-error-handling/&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>如何hack node模块</title>
       <link>//hongxuanlee.github.io/2016/11/hack_node/</link>
       <pubDate>Tue, 15 Nov 2016 22:08:22 +0800</pubDate>

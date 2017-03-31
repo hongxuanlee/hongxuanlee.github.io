@@ -22,7 +22,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Hugo 0.18.1">
-    <title>我的vim常用操作</title>
+    <title>nodeJs错误处理</title>
     <meta name="author" content="kino lee">
     <meta name="keywords" content="">
 
@@ -30,15 +30,21 @@
     
 
     
-    <meta name="description" content="列了些我的vim常用操作">
-    <meta property="og:description" content="列了些我的vim常用操作">
+    <meta name="description" content="debug一直是开发者的心头之痛，时常有人吐槽“20%的时间在写代码，而80%的时间都在调试代码”，哪怕项目发布后，一个线上问题也可能需要花很多时间去排查。那么我们如何在开发阶段多花点精力从而减少线上风险以及后续debug的时间投入呢？ 显而易见，增加程序的鲁棒性的方法之一便是的正确的错误处理，下面我将总结下在nodeJs应用中应该如何进行合理的错误处理。
+
+">
+    <meta property="og:description" content="debug一直是开发者的心头之痛，时常有人吐槽“20%的时间在写代码，而80%的时间都在调试代码”，哪怕项目发布后，一个线上问题也可能需要花很多时间去排查。那么我们如何在开发阶段多花点精力从而减少线上风险以及后续debug的时间投入呢？ 显而易见，增加程序的鲁棒性的方法之一便是的正确的错误处理，下面我将总结下在nodeJs应用中应该如何进行合理的错误处理。
+
+">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="我的vim常用操作">
-    <meta property="og:url" content="/2016/11/vim/">
+    <meta property="og:title" content="nodeJs错误处理">
+    <meta property="og:url" content="/2017/02/node_error_handle/">
     <meta property="og:site_name" content="Akatruki">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Akatruki">
-    <meta name="twitter:description" content="列了些我的vim常用操作">
+    <meta name="twitter:description" content="debug一直是开发者的心头之痛，时常有人吐槽“20%的时间在写代码，而80%的时间都在调试代码”，哪怕项目发布后，一个线上问题也可能需要花很多时间去排查。那么我们如何在开发阶段多花点精力从而减少线上风险以及后续debug的时间投入呢？ 显而易见，增加程序的鲁棒性的方法之一便是的正确的错误处理，下面我将总结下在nodeJs应用中应该如何进行合理的错误处理。
+
+">
     
       <meta name="twitter:creator" content="@lihongxuan213">
     
@@ -211,14 +217,14 @@
             <div class="post-header main-content-wrap text-left">
   
     <h1 class="post-title" itemprop="headline">
-      我的vim常用操作
+      nodeJs错误处理
     </h1>
   
   <div class="postShorten-meta post-meta">
   
-    <time itemprop="datePublished" datetime="2016-11-25T00:21:16&#43;08:00">
+    <time itemprop="datePublished" datetime="2017-02-28T00:00:00Z">
       
-   25, 2016
+   28, 2017
 
     </time>
   
@@ -227,7 +233,7 @@
   
     <span></span>
     
-      <a class="category-link" href="//hongxuanlee.github.io/categories/linux">linux</a>
+      <a class="category-link" href="//hongxuanlee.github.io/categories/nodejs">nodeJs</a>
     
   
 
@@ -238,81 +244,176 @@
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <h3 id="move">move</h3>
-
-<ul>
-<li><code>0</code> jump to line header</li>
-<li><code>^</code> jump to line header without blank</li>
-<li><code>$</code> jump to end of line</li>
-<li><code>w</code> skip next word head</li>
-<li><code>e</code> skip next word end</li>
-<li><code>%</code> jump match brackets</li>
-<li><code>*</code> jump to next same word with cursor</li>
-<li><code>#</code> jump to previous same word with cursor</li>
-<li><code>f&lt;letter&gt;</code> jump to letter  eg: fa</li>
-<li><code>&lt;num&gt;f&lt;letter&gt;</code> jump to letter appear third time eg: 3fa</li>
-</ul>
+              <p>debug一直是开发者的心头之痛，时常有人吐槽“20%的时间在写代码，而80%的时间都在调试代码”，哪怕项目发布后，一个线上问题也可能需要花很多时间去排查。那么我们如何在开发阶段多花点精力从而减少线上风险以及后续debug的时间投入呢？ 显而易见，增加程序的鲁棒性的方法之一便是的正确的错误处理，下面我将总结下在nodeJs应用中应该如何进行合理的错误处理。</p>
 
 <p></p>
 
-<h3 id="insert">insert</h3>
+<h3 id="nodejs异常抛出">nodeJs异常抛出</h3>
+
+<p>与其他语言（Java, C++）不一样的情况是，在nodeJs应用中并不会大量的直接使用throw抛出异常，因为nodeJs大部分错误都会出现在异步函数中，同步函数中很少需要抛出异常。</p>
+
+<p>其中，常见的异步函数的异常抛出方法大概有四种：</p>
 
 <ul>
-<li><code>o</code> insert new line</li>
-<li><code>O</code> insert new line above current line</li>
-<li><code>a</code> insert after cursor</li>
-<li><code>cw</code> replace cursor to word end</li>
+<li>普通回调：</li>
 </ul>
 
-<h3 id="operation">operation</h3>
+<pre><code>callback(new Error('something error'), null);
+</code></pre>
 
 <ul>
-<li><code>.</code> repeat last operation</li>
-<li><code>N&lt;command&gt;</code> repeat cmmand N</li>
-<li><code>:suspend</code> <code>ctrl + z</code> suspend</li>
-<li><code>fg</code> recover suspend</li>
+<li>promise:</li>
 </ul>
 
-<h3 id="delete">delete</h3>
+<pre><code>reject(new Error('something error')); 
+</code></pre>
 
 <ul>
-<li><code>de</code> delete word</li>
+<li>throw:</li>
 </ul>
 
-<h3 id="plugin">plugin</h3>
+<pre><code>throw new Error('something error')
+</code></pre>
 
 <ul>
-<li><code>:BundleInstall</code></li>
-<li><code>:BundleUpdate</code></li>
-<li><code>:BundleClean</code></li>
-<li><code>:BundleList</code></li>
-<li><code>:BundleSearch</code></li>
+<li>EventEmitter</li>
 </ul>
 
-<h3 id="code">code</h3>
+<pre><code>myEmitter.emit('error', new Error('something error'));
+
+</code></pre>
+
+<p>同步函数的错误抛出则一般是在<code>JSON.parse</code>的时候以及一些验证用户输入的情况。</p>
+
+<h3 id="错误类型">错误类型</h3>
+
+<p>一般来说，错误类型可以分为两种：操作错误（Operational errors），程序错误（Programmer errors）</p>
 
 <ul>
-<li><p><code>Ctrl-I</code> or <code>gf</code>  go to a file under the cursor</p></li>
+<li><p>操作错误：这类错误一般跟你的程序本身无关，主要分为两种：一种是用户输入(或环境)问题，还有一种便是依赖外部服务问题（如数据库连接超时，依赖服务请求失败等）</p></li>
 
-<li><p><code>Ctrl-O</code> go to previous file</p></li>
+<li><p>程序错误：这种一般来说便是程序bug, 比如没有验证用户输入，变量名使用错误等。</p></li>
 </ul>
 
-<h3 id="skills">skills</h3>
+<p>当然在某些情况下，没有被正确处理的操作错误就是程序错误。 举个简单的栗子，比如数据库连接失败了，这种属于操作错误，然而你并没有对数据库连接失败进行任何处理，那么这就是程序错误了，所以哪怕是操作错误，我们也需要认真对待，并对可能出现的错误进行合理的处理。</p>
+
+<p>操作错误基本的处理方式有：</p>
 
 <ul>
-<li><p>add comment to code</p>
-
-<ol>
-<li><code>v</code> virtual mode, select target</li>
-<li>【Control + v】</li>
-<li><code>I</code></li>
-<li><code>//</code></li>
-<li>【ESC】 + 【ESC】</li>
-</ol></li>
-
-<li><p>replace word
-<code>:%s/foo/bar/g</code></p></li>
+<li>直接处理错误</li>
+<li>将错误直接传递给client</li>
+<li>设置阈值的重试</li>
+<li>log记录</li>
 </ul>
+
+<h3 id="最佳实践">最佳实践</h3>
+
+<p>结合网上文章和自己的一些踩坑经验，稍微总结一下。</p>
+
+<ul>
+<li>使用promise对异常进行catch</li>
+</ul>
+
+<p>哪怕你的promise的链路过长，最深处的throw也能在最外层catch住:</p>
+
+<pre><code>doWork()
+ .then(doWork)
+ .then(doOtherWork)
+ .then((result) =&gt; doWork)
+ .catch((error) =&gt; throw error)
+</code></pre>
+
+<p>但如果你不幸忘记了catch(比如一些promise和generater混用的时候)，那么该nodeJs进程会触发<code>unhandledRejection</code>这个事件，并结束进程。这个情况在node 6.x的早期版本（以及古老的4.x）是不会主动有任何异常提示，错误就这样被生吞了，很容易导致后续调试困难。所以，为了避免这种情况发生，最好对<code>unhandledRejection</code>这个事件进行监听，记录相应的错误信息。哪怕你忘记处理promise异常也不会导致在node低版本中吞掉错误。如：</p>
+
+<pre><code>process.on('unhandledRejection', function (error, p) {
+  errlog();
+  throw error;
+});
+</code></pre>
+
+<ul>
+<li>监听uncaughtException事件</li>
+</ul>
+
+<pre><code>process.on('uncaughtException', function (error) {
+  //I just received an error that was never handled, time to handle it and then decide whether a restart is needed
+  errorManagement.handler.handleError(error);
+  if (!errorManagement.handler.isTrustedError(error))
+    process.exit(1);
+});
+</code></pre>
+
+<ul>
+<li>类型检查</li>
+</ul>
+
+<p>有一部分操作错误是来源于用户的输入错误，如果没有及早对用户输入进行类型判断和验证，并抛出异常，那么你的程序也是存在问题的。所以为了合理避免由于输入错误导致其他异常，应该严格按照你的文档规范对输入的变量进行类型检查，并根据你对输入的要求抛出正确的错误类型和错误信息。</p>
+
+<p><code>TypeError</code>、<code>RangeError</code>的例子:</p>
+
+<pre><code>  if (typeof val !== 'number') {
+    throw new TypeError(`${val} is not a number`);
+  }
+
+  if (val &gt; max || val &lt; min) {
+    throw new RangeError(`${val} is not between ${min} and ${max}`);
+  }
+</code></pre>
+
+<ul>
+<li>操作错误和程序错误分别处理。</li>
+</ul>
+
+<p>如果你的应用重度依赖第三方服务，务必将操作错误和程序错误分开处理。</p>
+
+<pre><code>//marking an error object as operational 
+var myError = new Error(&quot;How can I add new product when no value provided?&quot;);
+myError.isOperational = true;
+ 
+//or if you're using some centralized error factory (see other examples at the bullet &quot;Use only the built-in Error object&quot;)
+function appError(commonType, description, isOperational) {
+    Error.call(this);
+    Error.captureStackTrace(this);
+    this.commonType = commonType;
+    this.description = description;
+    this.isOperational = isOperational;
+};
+ 
+throw new appError(errorManagement.commonErrors.InvalidInput, &quot;Describe here what happened&quot;, true);
+ 
+//error handling code within middleware
+process.on('uncaughtException', function(error) {
+    if(!error.isOperational)
+        process.exit(1);
+});
+
+</code></pre>
+
+<ul>
+<li>错误集中处理, 但不要在中间件上处理。</li>
+</ul>
+
+<p>为了防止错误多次重复处理或者错误处理不当，错误处理最好能集中在一个对象上，但不要写在中间件上，因为中间件不能处理非Web接口的错误。</p>
+
+<pre><code>//handling errors within a dedicated object
+module.exports.handler = new errorHandler();
+ 
+function errorHandler(){
+    this.handleError = function (error) {
+        return logger.logError(err).then(sendMailToAdminIfCritical).then(saveInOpsQueueIfCritical).then(determineIfOperationalError);
+    }
+}
+</code></pre>
+
+<h3 id="总结">总结</h3>
+
+<p>提高nodeJs鲁棒性，完善的单测覆盖和合理的错误处理都必不可少。虽然会增加不少开发成本，但对于后续调试、重构以及维护有着不可或缺的作用。</p>
+
+<p>参考资料:</p>
+
+<p><a href="https://www.joyent.com/node-js/production/design/errors">https://www.joyent.com/node-js/production/design/errors</a></p>
+
+<p><a href="http://goldbergyoni.com/checklist-best-practices-of-node-js-error-handling/">http://goldbergyoni.com/checklist-best-practices-of-node-js-error-handling/</a></p>
               
             </div>
           </div>
@@ -324,11 +425,11 @@
                   <div class="post-footer-tags">
                     <span class="text-color-light text-small"></span><br/>
                     
-  <a class="tag tag--primary tag--small" href="//hongxuanlee.github.io/tags/vim/">vim</a>
+  <a class="tag tag--primary tag--small" href="//hongxuanlee.github.io/tags/nodejs/">nodeJs</a>
 
-  <a class="tag tag--primary tag--small" href="//hongxuanlee.github.io/tags/linux/">linux</a>
+  <a class="tag tag--primary tag--small" href="//hongxuanlee.github.io/tags/error-handle/">error-handle</a>
 
-  <a class="tag tag--primary tag--small" href="//hongxuanlee.github.io/tags/develop/">develop</a>
+  <a class="tag tag--primary tag--small" href="//hongxuanlee.github.io/tags/promise/">promise</a>
 
                   </div>
                 
@@ -340,7 +441,7 @@
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="//hongxuanlee.github.io/2017/02/node_error_handle/" data-tooltip="nodeJs错误处理">
+            <a class="post-action-btn btn btn--default tooltip--top" href="//hongxuanlee.github.io/2017/03/raw_sorket/" data-tooltip="在C中使用raw sorket进行IP包转发">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml"></span>
@@ -348,7 +449,7 @@
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="//hongxuanlee.github.io/2016/11/tmux/" data-tooltip="我的tmux常用操作">
+            <a class="post-action-btn btn btn--default tooltip--top" href="//hongxuanlee.github.io/2016/11/vim/" data-tooltip="我的vim常用操作">
           
             <span class="hide-xs hide-sm text-small icon-mr"></span>
             <i class="fa fa-angle-right"></i>
@@ -365,17 +466,17 @@
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=%2f%2fhongxuanlee.github.io%2f2016%2f11%2fvim%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=%2f%2fhongxuanlee.github.io%2f2017%2f02%2fnode_error_handle%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%2f%2fhongxuanlee.github.io%2f2016%2f11%2fvim%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%2f%2fhongxuanlee.github.io%2f2017%2f02%2fnode_error_handle%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%2f%2fhongxuanlee.github.io%2f2016%2f11%2fvim%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%2f%2fhongxuanlee.github.io%2f2017%2f02%2fnode_error_handle%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -392,6 +493,8 @@
 </div>
 
 
+            
+              
             
           </div>
         </article>
@@ -410,7 +513,7 @@
       
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="//hongxuanlee.github.io/2017/02/node_error_handle/" data-tooltip="nodeJs错误处理">
+            <a class="post-action-btn btn btn--default tooltip--top" href="//hongxuanlee.github.io/2017/03/raw_sorket/" data-tooltip="在C中使用raw sorket进行IP包转发">
           
             <i class="fa fa-angle-left"></i>
             <span class="hide-xs hide-sm text-small icon-ml"></span>
@@ -418,7 +521,7 @@
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="//hongxuanlee.github.io/2016/11/tmux/" data-tooltip="我的tmux常用操作">
+            <a class="post-action-btn btn btn--default tooltip--top" href="//hongxuanlee.github.io/2016/11/vim/" data-tooltip="我的vim常用操作">
           
             <span class="hide-xs hide-sm text-small icon-mr"></span>
             <i class="fa fa-angle-right"></i>
@@ -435,17 +538,17 @@
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=%2f%2fhongxuanlee.github.io%2f2016%2f11%2fvim%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=%2f%2fhongxuanlee.github.io%2f2017%2f02%2fnode_error_handle%2f">
           <i class="fa fa-google-plus"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%2f%2fhongxuanlee.github.io%2f2016%2f11%2fvim%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%2f%2fhongxuanlee.github.io%2f2017%2f02%2fnode_error_handle%2f">
           <i class="fa fa-facebook-official"></i>
         </a>
       </li>
       <li class="post-action hide-xs">
-        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%2f%2fhongxuanlee.github.io%2f2016%2f11%2fvim%2f">
+        <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%2f%2fhongxuanlee.github.io%2f2017%2f02%2fnode_error_handle%2f">
           <i class="fa fa-twitter"></i>
         </a>
       </li>
@@ -466,17 +569,17 @@
       <div id="share-options-bar" class="share-options-bar" data-behavior="5">
   <ul class="share-options">
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%2f%2fhongxuanlee.github.io%2f2016%2f11%2fvim%2f">
+      <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%2f%2fhongxuanlee.github.io%2f2017%2f02%2fnode_error_handle%2f">
         <i class="fa fa-google-plus"></i><span></span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%2f%2fhongxuanlee.github.io%2f2016%2f11%2fvim%2f">
+      <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%2f%2fhongxuanlee.github.io%2f2017%2f02%2fnode_error_handle%2f">
         <i class="fa fa-facebook-official"></i><span></span>
       </a>
     </li>
     <li class="share-option">
-      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=%2f%2fhongxuanlee.github.io%2f2016%2f11%2fvim%2f">
+      <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=%2f%2fhongxuanlee.github.io%2f2017%2f02%2fnode_error_handle%2f">
         <i class="fa fa-twitter"></i><span></span>
       </a>
     </li>
@@ -720,6 +823,8 @@ $(document).ready(function() {
 });
 </script>
 
+  
+    
   
 
 

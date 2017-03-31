@@ -30,7 +30,7 @@
     
 
     
-    <meta name="description" content="一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。在这里，我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。
+    <meta name="description" content="一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。但有的同学会觉得libpcap太重了，如果只是用于学习和简单调试，在这里我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。
 
 在阅读这篇文章及案例前，需要对OSI网络模型有些基本的了解，tcp,ip,http头部信息结构可以看看对应的维基，在此我就不再赘述了。
 
@@ -47,7 +47,7 @@ Http-request-header:
 
 
 ">
-    <meta property="og:description" content="一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。在这里，我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。
+    <meta property="og:description" content="一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。但有的同学会觉得libpcap太重了，如果只是用于学习和简单调试，在这里我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。
 
 在阅读这篇文章及案例前，需要对OSI网络模型有些基本的了解，tcp,ip,http头部信息结构可以看看对应的维基，在此我就不再赘述了。
 
@@ -70,7 +70,7 @@ Http-request-header:
     <meta property="og:site_name" content="Akatruki">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Akatruki">
-    <meta name="twitter:description" content="一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。在这里，我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。
+    <meta name="twitter:description" content="一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。但有的同学会觉得libpcap太重了，如果只是用于学习和简单调试，在这里我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。
 
 在阅读这篇文章及案例前，需要对OSI网络模型有些基本的了解，tcp,ip,http头部信息结构可以看看对应的维基，在此我就不再赘述了。
 
@@ -286,7 +286,7 @@ Http-request-header:
           
           <div class="post-content markdown" itemprop="articleBody">
             <div class="main-content-wrap">
-              <p>一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。在这里，我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。</p>
+              <p>一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。但有的同学会觉得libpcap太重了，如果只是用于学习和简单调试，在这里我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。</p>
 
 <p>在阅读这篇文章及案例前，需要对OSI网络模型有些基本的了解，tcp,ip,http头部信息结构可以看看对应的维基，在此我就不再赘述了。</p>
 
@@ -359,7 +359,8 @@ Http-request-header:
 <li>构造ip包后即可发包(IP包篡改可具体看后面案例，现在假设IP包已经构造好了，buffer是报文，iph是ip头部信息，tcph是tcp的头部信息)</li>
 </ul>
 
-<pre><code class="language-c">    struct sockaddr_in dest_addr;
+<pre><code class="language-c">while(1){
+    struct sockaddr_in dest_addr;
     dest_addr.sin_family = AF_INET;
     dest_addr.sin_port = tcph -&gt; dest;
     dest_addr.sin_addr.s_addr = iph -&gt; daddr;
@@ -372,6 +373,7 @@ Http-request-header:
     {
         printf (&quot;Packet Send. Length : %d \n&quot; , ntohs(iph -&gt; tot_len));
     }
+  }
 
 </code></pre>
 
@@ -412,9 +414,9 @@ Http-request-header:
 <h3 id="如何调试">如何调试</h3>
 
 <ul>
-<li><p>tcpdump: <a href="https://danielmiessler.com/study/tcpdump/（命令行）">https://danielmiessler.com/study/tcpdump/（命令行）</a></p></li>
+<li><p>tcpdump（命令行）: <a href="https://danielmiessler.com/study/tcpdump/">https://danielmiessler.com/study/tcpdump/</a></p></li>
 
-<li><p>wireshark: <a href="https://www.wireshark.org/（应用）">https://www.wireshark.org/（应用）</a></p></li>
+<li><p>wireshark（可视化应用）: <a href="https://www.wireshark.org/">https://www.wireshark.org/</a></p></li>
 </ul>
 
 <h3 id="可能的坑">可能的坑</h3>
@@ -469,7 +471,7 @@ Http-request-header:
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="//hongxuanlee.github.io/2016/11/vim/" data-tooltip="我的vim常用操作">
+            <a class="post-action-btn btn btn--default tooltip--top" href="//hongxuanlee.github.io/2017/02/node_error_handle/" data-tooltip="nodeJs错误处理">
           
             <span class="hide-xs hide-sm text-small icon-mr"></span>
             <i class="fa fa-angle-right"></i>
@@ -541,7 +543,7 @@ Http-request-header:
         </li>
         <li class="post-action">
           
-            <a class="post-action-btn btn btn--default tooltip--top" href="//hongxuanlee.github.io/2016/11/vim/" data-tooltip="我的vim常用操作">
+            <a class="post-action-btn btn btn--default tooltip--top" href="//hongxuanlee.github.io/2017/02/node_error_handle/" data-tooltip="nodeJs错误处理">
           
             <span class="hide-xs hide-sm text-small icon-mr"></span>
             <i class="fa fa-angle-right"></i>
@@ -667,7 +669,7 @@ Http-request-header:
                   Mar 3, 2017
                 </span>
               </span>
-              <div class="media-content hide-xs font-merryweather"><p>一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。在这里，我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。</p>
+              <div class="media-content hide-xs font-merryweather"><p>一般来说，ip包的抓取和转发可以用赫赫有名的libpcap来做，发包时不仅仅需要构造ip包，也需要构造以太网帧的头部，并指定链路层的device。但有的同学会觉得libpcap太重了，如果只是用于学习和简单调试，在这里我来简单的介绍另外一种ip包嗅探和转发的方法: 使用raw socket，并提供一个简单对http请求进行ip包转发demo。</p>
 
 <p>在阅读这篇文章及案例前，需要对OSI网络模型有些基本的了解，tcp,ip,http头部信息结构可以看看对应的维基，在此我就不再赘述了。</p>
 
@@ -682,6 +684,25 @@ Http-request-header:
 <li><p>Http-request-header:
    <a href="https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Request_fields">https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Request_fields</a></p></li>
 </ul>
+
+<p></p></div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="//hongxuanlee.github.io/2017/02/node_error_handle/">
+                <h3 class="media-heading">nodeJs错误处理</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Feb 2, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather"><p>debug一直是开发者的心头之痛，时常有人吐槽“20%的时间在写代码，而80%的时间都在调试代码”，哪怕项目发布后，一个线上问题也可能需要花很多时间去排查。那么我们如何在开发阶段多花点精力从而减少线上风险以及后续debug的时间投入呢？ 显而易见，增加程序的鲁棒性的方法之一便是的正确的错误处理，下面我将总结下在nodeJs应用中应该如何进行合理的错误处理。</p>
 
 <p></p></div>
             </div>
@@ -784,7 +805,7 @@ Http-request-header:
          data-message-zero=""
          data-message-one=""
          data-message-other="">
-         4 posts found
+         5 posts found
       </p>
     </div>
   </div>

@@ -7,6 +7,11 @@
   </url>
   
   <url>
+    <loc>//hongxuanlee.github.io/2017/02/node_error_handle/</loc>
+    <lastmod>2017-02-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>//hongxuanlee.github.io/2016/11/vim/</loc>
     <lastmod>2016-11-25T00:21:16+08:00</lastmod>
   </url>
@@ -62,6 +67,12 @@
   </url>
   
   <url>
+    <loc>//hongxuanlee.github.io/tags/error-handle/</loc>
+    <lastmod>2017-02-28T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>//hongxuanlee.github.io/tags/hack/</loc>
     <lastmod>2016-11-15T22:08:22+08:00</lastmod>
     <priority>0</priority>
@@ -93,19 +104,25 @@
   
   <url>
     <loc>//hongxuanlee.github.io/tags/nodejs/</loc>
-    <lastmod>2016-11-15T22:08:22+08:00</lastmod>
+    <lastmod>2017-02-28T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>//hongxuanlee.github.io/categories/nodejs/</loc>
-    <lastmod>2016-11-15T22:08:22+08:00</lastmod>
+    <lastmod>2017-02-28T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>//hongxuanlee.github.io/post/</loc>
     <lastmod>2017-03-25T00:19:18+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>//hongxuanlee.github.io/tags/promise/</loc>
+    <lastmod>2017-02-28T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

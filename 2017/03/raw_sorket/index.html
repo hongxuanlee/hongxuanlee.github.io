@@ -331,7 +331,9 @@ Http-request-header:
 <li>将socket option中的IP_HDRINCL设置为1，这样才能发包（如果只需要抓包不需要这一步）</li>
 </ul>
 
-<pre><code class="language-c">  if (setsockopt (s, IPPROTO_IP, IP_HDRINCL, val, sizeof (one)) &lt; 0)
+<pre><code class="language-c">  int one = 1;
+  const int *val = &amp;one;
+  if (setsockopt (s, IPPROTO_IP, IP_HDRINCL, val, sizeof (one)) &lt; 0)
     {
         perror(&quot;Error setting IP_HDRINCL&quot;);
     }
@@ -341,38 +343,38 @@ Http-request-header:
 <li>将socket的recvfrom置于无限循环中，这样便能无限抓包 （如果只需要发包不需要这一步）</li>
 </ul>
 
-<pre><code class="language-c++">  struct sockaddr_in serverProxy;
-  u_char raw_Buffer[1024];
-  int saddr_size = sizeof serverProxy;
-  int data_size = recvfrom(s , raw_Buffer , 1024, 0 , (struct sockaddr *)&amp;serverProxy , &amp;saddr_size);
+<pre><code class="language-c++">  while(1){
+    struct sockaddr_in serverProxy;
+    u_char raw_Buffer[1024];
+    int saddr_size = sizeof serverProxy;
+    int data_size = recvfrom(s , raw_Buffer , 1024, 0 , (struct sockaddr *)&amp;serverProxy , &amp;saddr_size);
 
-  if(data_size &lt; 0)
-  {
-     printf(&quot;Recvfrom error , failed to get packets\n&quot;);
-     return 1;
+    if(data_size &lt; 0)
+    {
+       printf(&quot;Recvfrom error , failed to get packets\n&quot;);
+       return 1;
+    }
+    //Now process the packet
+    ProcessPacket(raw_Buffer , data_size, s);
   }
-  //Now process the packet
-  ProcessPacket(raw_Buffer , data_size, s);
 </code></pre>
 
 <ul>
 <li>构造ip包后即可发包(IP包篡改可具体看后面案例，现在假设IP包已经构造好了，buffer是报文，iph是ip头部信息，tcph是tcp的头部信息)</li>
 </ul>
 
-<pre><code class="language-c">while(1){
-    struct sockaddr_in dest_addr;
-    dest_addr.sin_family = AF_INET;
-    dest_addr.sin_port = tcph -&gt; dest;
-    dest_addr.sin_addr.s_addr = iph -&gt; daddr;
+<pre><code class="language-c">  struct sockaddr_in dest_addr;
+  dest_addr.sin_family = AF_INET;
+  dest_addr.sin_port = tcph -&gt; dest;
+  dest_addr.sin_addr.s_addr = iph -&gt; daddr;
 
-    if (sendto (s, buffer, ntohs(iph -&gt; tot_len),  0, (struct sockaddr *) &amp;dest_addr, sizeof (dest_addr)) &lt; 0)
-    {
-        perror(&quot;sendto failed&quot;);
-    }
-    else
-    {
-        printf (&quot;Packet Send. Length : %d \n&quot; , ntohs(iph -&gt; tot_len));
-    }
+  if (sendto (s, buffer, ntohs(iph -&gt; tot_len),  0, (struct sockaddr *) &amp;dest_addr, sizeof (dest_addr)) &lt; 0)
+  {
+      perror(&quot;sendto failed&quot;);
+  }
+  else
+  {
+      printf (&quot;Packet Send. Length : %d \n&quot; , ntohs(iph -&gt; tot_len));
   }
 
 </code></pre>

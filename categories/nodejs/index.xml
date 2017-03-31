@@ -102,8 +102,10 @@
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
-&lt;li&gt;监听uncaughtException事件&lt;/li&gt;
+&lt;li&gt;处理未捕获的异常&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;p&gt;在某些场景下，有些异常可能会没有捕获到。可以通过监听&lt;code&gt;uncaughtException&lt;/code&gt;事件来进行相应的处理&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;process.on(&#39;uncaughtException&#39;, function (error) {
   //I just received an error that was never handled, time to handle it and then decide whether a restart is needed

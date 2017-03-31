@@ -332,8 +332,10 @@
 </code></pre>
 
 <ul>
-<li>监听uncaughtException事件</li>
+<li>处理未捕获的异常</li>
 </ul>
+
+<p>在某些场景下，有些异常可能会没有捕获到。可以通过监听<code>uncaughtException</code>事件来进行相应的处理</p>
 
 <pre><code>process.on('uncaughtException', function (error) {
   //I just received an error that was never handled, time to handle it and then decide whether a restart is needed

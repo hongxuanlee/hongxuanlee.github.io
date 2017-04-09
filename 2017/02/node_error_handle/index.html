@@ -250,9 +250,9 @@
 
 <h3 id="nodejs异常抛出">nodeJs异常抛出</h3>
 
-<p>与其他语言（Java, C++）不一样的情况是，在nodeJs应用中并不会大量的直接使用throw抛出异常，因为nodeJs大部分错误都会出现在异步函数中，同步函数中很少需要抛出异常。</p>
+<p>与其他语言（Java, C++）不一样的情况是，nodeJs大部分错误都会出现在异步函数中，同步函数中很少需要抛出异常。</p>
 
-<p>其中，常见的异步函数的异常抛出方法大概有四种：</p>
+<p>一般来说，常见的异步函数的异常抛出方法大概有四种：</p>
 
 <ul>
 <li>普通回调：</li>
@@ -280,7 +280,6 @@
 </ul>
 
 <pre><code>myEmitter.emit('error', new Error('something error'));
-
 </code></pre>
 
 <p>同步函数的错误抛出则一般是在<code>JSON.parse</code>的时候以及一些验证用户输入的情况。</p>
@@ -307,8 +306,6 @@
 </ul>
 
 <h3 id="最佳实践">最佳实践</h3>
-
-<p>结合网上文章和自己的一些踩坑经验，稍微总结一下。</p>
 
 <ul>
 <li>使用promise对异常进行catch</li>
@@ -484,6 +481,12 @@ function errorHandler(){
       </li>
     
     
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
+    
     <li class="post-action">
       
         <a class="post-action-btn btn btn--default" href="#">
@@ -496,6 +499,10 @@ function errorHandler(){
 
 
             
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
               
             
           </div>
@@ -555,6 +562,12 @@ function errorHandler(){
         </a>
       </li>
     
+    
+      <li class="post-action">
+        <a class="post-action-btn btn btn--default" href="#disqus_thread">
+          <i class="fa fa-comment-o"></i>
+        </a>
+      </li>
     
     <li class="post-action">
       
@@ -790,11 +803,7 @@ function errorHandler(){
     </div>
   </div>
 </div>
-    
-  
-    
-    <div id="cover" style="background-image:url('//hongxuanlee.github.io/images/cover.jpg');"></div>
-  
+    <div id="cover" style="background:#1ab394"></div>
 
 
     
@@ -826,6 +835,28 @@ $(document).ready(function() {
 </script>
 
   
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = '\/\/hongxuanlee.github.io\/2017\/02\/node_error_handle\/';
+          
+            this.page.identifier = '\/2017\/02\/node_error_handle\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'hongxuanlee';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
     
   
 

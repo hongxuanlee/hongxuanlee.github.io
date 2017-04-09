@@ -20,9 +20,9 @@
 
 &lt;h3 id=&#34;nodejs异常抛出&#34;&gt;nodeJs异常抛出&lt;/h3&gt;
 
-&lt;p&gt;与其他语言（Java, C++）不一样的情况是，在nodeJs应用中并不会大量的直接使用throw抛出异常，因为nodeJs大部分错误都会出现在异步函数中，同步函数中很少需要抛出异常。&lt;/p&gt;
+&lt;p&gt;与其他语言（Java, C++）不一样的情况是，nodeJs大部分错误都会出现在异步函数中，同步函数中很少需要抛出异常。&lt;/p&gt;
 
-&lt;p&gt;其中，常见的异步函数的异常抛出方法大概有四种：&lt;/p&gt;
+&lt;p&gt;一般来说，常见的异步函数的异常抛出方法大概有四种：&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;普通回调：&lt;/li&gt;
@@ -50,7 +50,6 @@
 &lt;/ul&gt;
 
 &lt;pre&gt;&lt;code&gt;myEmitter.emit(&#39;error&#39;, new Error(&#39;something error&#39;));
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;同步函数的错误抛出则一般是在&lt;code&gt;JSON.parse&lt;/code&gt;的时候以及一些验证用户输入的情况。&lt;/p&gt;
@@ -77,8 +76,6 @@
 &lt;/ul&gt;
 
 &lt;h3 id=&#34;最佳实践&#34;&gt;最佳实践&lt;/h3&gt;
-
-&lt;p&gt;结合网上文章和自己的一些踩坑经验，稍微总结一下。&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;使用promise对异常进行catch&lt;/li&gt;

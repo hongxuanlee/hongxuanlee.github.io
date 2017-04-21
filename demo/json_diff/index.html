@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>json diff</title>
+  <style type="text/css">
+    .container{
+      width: 800px;
+      margin: 0 auto;
+    }
+    .submit{
+      clear: both;
+      text-align: center;
+    }
+    .editor{
+      width: 350px;
+      height: 300px;
+      float: left;
+      margin-left: 20px;
+    }
+    .diff{
+       height: 30px;
+       width: 80px;
+       margin-top: 20px;
+    }
+    .jDiff-container{
+       width: 600px;
+       margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+    <div class="container">
+      <textarea class="editor" id="left">
+{
+    "data": [0, 1, 2, 3],
+    "message": "success",
+    "status": 0
+}
+      </textarea>
+      <textarea class="editor" id="right">
+{
+    "data": [0, 1, 2, 3],
+    "message": "success",
+    "status": 0,
+    "a": 10
+}
+      </textarea>
+      <div class="submit">
+         <button class="diff">Diff</button>
+      </div>
+     
+    </div>
+    <div id="content">
+      
+    </div>
+
+<script src="./index.js">
+</script>
+</body>
+</html>
